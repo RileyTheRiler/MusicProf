@@ -1,4 +1,10 @@
 import type { EffectDefinition } from '../../types';
+import {
+  fenderCleanDef,
+  marshallCrunchDef,
+  mesaHiGainDef,
+  voxChimeDef,
+} from './amp';
 import { compressorDef } from './compressor';
 import { distortionDef } from './distortion';
 import { eqDef } from './eq';
@@ -58,31 +64,6 @@ const wahStub: EffectDefinition = {
     ],
     headrushNotes:
       'On the Prime, the Wah block ties to the expression pedal. Often paired with overdrive — the wah\'s peak is so sharp it can self-oscillate when overdriven.',
-    paramTips: {},
-  },
-};
-
-const ampStub: EffectDefinition = {
-  id: 'amp',
-  displayName: 'Amp Model',
-  category: 'amp',
-  shortDescription:
-    'Models the preamp + power amp + tone stack of a tube guitar amplifier.',
-  implemented: false,
-  params: [],
-  lesson: {
-    tldr: 'An amp model captures the gain-staging, EQ, and saturation of a real tube amp — multiple stages of soft clipping, each with its own tone shape.',
-    whatItDoes:
-      'A guitar amp is a chain of: input gain → tone stack (Bass/Mid/Treble interactive EQ) → multiple gain stages with soft tube clipping → power amp (more clipping, plus output transformer "sag") → out to cab. Modeling captures each stage\'s nonlinear response, often with neural networks or carefully tuned algorithms.',
-    physics:
-      'Triodes (the tube types in guitar amps) have a smooth, asymmetric transfer curve — they soft-clip with even and odd harmonics. Power tubes (pentodes) clip more aggressively. The output transformer adds compression ("sag") under load. Real amps depend heavily on the speaker load impedance, making them inseparable from cabs.',
-    signalImpact: [
-      'Multiple stages of compression and saturation',
-      'Tone stack is interactive — bass/mid/treble knobs affect each other',
-      'Different amps have wildly different gain structures (Fender = clean breakup, Marshall = midrange crunch, Mesa = high-gain saturation)',
-    ],
-    headrushNotes:
-      'The Prime ships with 50+ amp models — Fender Twin, JCM800, Mesa Rectifier, Vox AC30, Diezel VH4, etc. Always pair with a Cab block for proper tone.',
     paramTips: {},
   },
 };
@@ -193,7 +174,10 @@ const allDefs: EffectDefinition[] = [
   wahStub,
   pitchStub,
   distortionDef,
-  ampStub,
+  fenderCleanDef,
+  marshallCrunchDef,
+  mesaHiGainDef,
+  voxChimeDef,
   eqDef,
   cabDef,
   chorusDef,

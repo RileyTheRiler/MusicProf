@@ -16,21 +16,27 @@ npm run dev          # http://localhost:5173
 Then click **Power on** in the top right to start the audio engine (browsers
 require a user gesture before any audio plays).
 
-## What's in v0
+## What's in here
 
-- **Audio engine** built on Tone.js + the Web Audio API. Source is a 8-voice
+- **Audio engine** built on Tone.js + the Web Audio API. Source is an 8-voice
   Karplus-Strong plucked-string synth.
 - **Working effect blocks (real DSP):**
   - Studio Compressor
   - Overdrive (Tube-Screamer style)
+  - **Amp models:** Fender Clean (Twin), Marshall Crunch (Plexi/JCM),
+    Mesa Hi-Gain (Mark/Recto), Vox Chime (AC30) — each with its own
+    multi-stage waveshaper curves and tone-stack voicing
   - 3-Band EQ
   - Cabinet (4×12 filter approximation)
   - Chorus
   - Analog Delay (with feedback filter)
   - Hall Reverb
+- **Tone presets:** one-click load complete chains modeling real-world tones
+  — Pristine Clean, Blues Crunch, Classic Rock Lead, Modern Metal,
+  Ambient Lead, Funk Clean.
 - **Catalog-only blocks (lessons present, audio coming soon):** Noise Gate,
-  Wah, Pitch Shifter, Amp Models, Flanger, Phaser, Tremolo.
-- **Chain editor:** drag blocks left/right, bypass them, remove them, add new ones.
+  Wah, Pitch Shifter, Flanger, Phaser, Tremolo.
+- **Chain editor:** add, remove, reorder, and bypass blocks.
 - **Visualizer:** dry vs. wet waveform + log-frequency spectrum, side-by-side.
 - **Lesson panel:** TL;DR + what-it-does + physics + signal impact + Headrush
   Prime mapping + per-knob tips, all updating with the currently-selected block.
@@ -44,6 +50,7 @@ src/
     voice.ts           # GuitarVoice (PluckSynth pool)
     effects/
       index.ts         # registry + categories
+      amp.ts           # shared amp factory + 4 amp models
       compressor.ts
       distortion.ts
       eq.ts
@@ -52,7 +59,9 @@ src/
       delay.ts
       reverb.ts
   components/          # React UI (Knob, EffectBlock, SignalChain, ...)
-  data/chords.ts       # open-position chord library
+  data/
+    chords.ts          # open-position chord library
+    presets.ts         # complete-chain tone presets
   hooks/               # useAnimationFrame
   types/               # shared TS types
 ```
@@ -68,10 +77,10 @@ src/
 
 ## Roadmap
 
-- Real amp models (multi-stage tube saturation)
-- Convolution-based cabinet IRs
+- Convolution-based cabinet IRs (real Greenback / V30 recordings)
 - Wah pedal with mouse-controlled "rocker"
+- Noise gate, Flanger, Phaser, Tremolo, Pitch Shifter audio
 - Live guitar input via Web Audio (plug an audio interface into the browser)
 - Lessons mode: structured curriculum (Signal Chain 101 → physics of pickups → ...)
 - Tap-tempo + tempo-synced delay
-- Save/load presets
+- User-saved presets (localStorage)

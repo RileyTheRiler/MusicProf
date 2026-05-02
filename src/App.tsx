@@ -4,31 +4,62 @@ import { effectDefinitions } from './audio/effects';
 import { ChordPicker } from './components/ChordPicker';
 import { EffectPalette } from './components/EffectPalette';
 import { LessonPanel } from './components/LessonPanel';
+import { PresetBar } from './components/PresetBar';
 import { SignalChain } from './components/SignalChain';
 import { Visualizer } from './components/Visualizer';
+import type { Preset } from './data/presets';
 import type { ChainBlock, EffectDefinition } from './types';
 
 let blockSeq = 0;
 const newBlockId = () => `b${++blockSeq}`;
 
 const defaultChain = (): ChainBlock[] => {
-  // Comp -> Drive -> EQ -> Cab -> Chorus -> Delay -> Reverb (Headrush-typical order)
-  // Start with most blocks bypassed so the user starts with a clean tone.
-  const make = (defId: string, bypass = true): ChainBlock => {
+  // Comp -> Drive -> Amp -> EQ -> Cab -> Mod -> Delay -> Reverb (Headrush-typical order).
+  // Most blocks start bypassed; the Amp + Cab + a touch of reverb are on so
+  // the default tone sounds like a real guitar rig (not just a raw synth).
+  const make = (
+    defId: string,
+    bypass = true,
+    overrides: Record<string, number> = {}
+  ): ChainBlock => {
     const def = effectDefinitions[defId];
     const paramValues: Record<string, number> = {};
     for (const p of def.params) paramValues[p.id] = p.default;
+    Object.assign(paramValues, overrides);
     return { id: newBlockId(), defId, bypass, paramValues };
   };
   return [
     make('comp-studio'),
     make('overdrive'),
+    make('amp-marshall-crunch', false, {
+      gain: 3,
+      bass: 0,
+      mid: 2,
+      treble: 3,
+      presence: 1,
+    }),
     make('eq-3band'),
-    make('cab-4x12', false), // Cab on by default — without it, distortion sounds awful
+    make('cab-4x12', false),
     make('mod-chorus'),
     make('delay-analog'),
-    make('reverb-hall'),
+    make('reverb-hall', false, { mix: 0.18, size: 0.45 }),
   ];
+};
+
+const blockFromPreset = (
+  defId: string,
+  bypass: boolean,
+  paramValues: Record<string, number>
+): ChainBlock => {
+  const def = effectDefinitions[defId];
+  // Fill in any missing params with defaults so the chain is always well-formed
+  // even if a preset was authored before a new param was added.
+  const merged: Record<string, number> = {};
+  if (def) {
+    for (const p of def.params) merged[p.id] = p.default;
+  }
+  Object.assign(merged, paramValues);
+  return { id: newBlockId(), defId, bypass, paramValues: merged };
 };
 
 export default function App() {
@@ -95,6 +126,14 @@ export default function App() {
     engine.setMasterVolume(db);
   };
 
+  const handleLoadPreset = (preset: Preset) => {
+    const next = preset.blocks.map((b) =>
+      blockFromPreset(b.defId, b.bypass, b.paramValues)
+    );
+    updateChain(next);
+    setSelectedId(null);
+  };
+
   const selectedBlock = chain.find((b) => b.id === selectedId) ?? null;
   const selectedDef = selectedBlock
     ? effectDefinitions[selectedBlock.defId] ?? null
@@ -149,6 +188,8 @@ export default function App() {
 
       <main className="max-w-[1600px] mx-auto p-4 grid grid-cols-12 gap-4">
         <div className="col-span-12 lg:col-span-8 space-y-4">
+          <PresetBar onLoad={handleLoadPreset} />
+
           <SignalChain
             chain={chain}
             selectedId={selectedId}
