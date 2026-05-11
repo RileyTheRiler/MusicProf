@@ -1209,12 +1209,85 @@ const lessonLiveInput: Lesson = {
   ],
 };
 
+const lessonTuning: Lesson = {
+  id: 'tuning',
+  title: 'Tuning',
+  subtitle:
+    'What pitch actually is, what cents mean, and how the autocorrelation tuner figures out what note you played.',
+  estMinutes: 5,
+  body: [
+    {
+      kind: 'p',
+      text: 'A guitar that\'s out of tune is *unlistenable*, regardless of how great your tone is. Every guitarist eventually gets a tuner. But what is "in tune" really, and how does a digital tuner figure out what you played?',
+    },
+    { kind: 'h2', text: 'Pitch is just frequency' },
+    {
+      kind: 'p',
+      text: 'A note is a sound wave that repeats at a steady frequency. "A above middle C" is 440 Hz — 440 cycles per second. Every octave doubles: A3 is 220 Hz, A4 is 440 Hz, A5 is 880 Hz. The 12-note Western chromatic scale divides each octave into 12 equally-spaced "semitones".',
+    },
+    {
+      kind: 'p',
+      text: 'But "equally spaced" in *what* sense? Not equal Hz differences — that would make the upper octaves crammed and the lower ones spread out. It\'s equal LOGARITHMIC spacing: each semitone is a multiplicative factor of 2^(1/12) ≈ 1.0595. From A=440, the next semitone up (A♯) is 440 × 1.0595 ≈ 466.16 Hz. Up another semitone (B) is 466.16 × 1.0595 ≈ 493.88 Hz. And so on for 12 steps until you reach 880 (one octave up).',
+    },
+    {
+      kind: 'callout',
+      flavor: 'info',
+      title: 'Standard guitar tuning frequencies',
+      text: 'E2 = 82.41 Hz · A2 = 110.00 Hz · D3 = 146.83 Hz · G3 = 196.00 Hz · B3 = 246.94 Hz · E4 = 329.63 Hz. These are the six open strings, low to high. Memorizing them isn\'t important; the spirit of "doubling = octave, ratio = semitone" is.',
+    },
+    { kind: 'h2', text: 'Cents — the fine resolution' },
+    {
+      kind: 'p',
+      text: 'A semitone is divided into 100 **cents** for precise tuning. So +50 cents is exactly halfway between two semitones. Human ears can typically hear pitch differences of ~5 cents on adjacent notes. Below that, your guitar will sound "good" even though it\'s not perfectly mathematically in tune.',
+    },
+    {
+      kind: 'list',
+      items: [
+        '**0 cents** = perfectly in tune.',
+        '**±5 cents** = imperceptible to most listeners; in tune by any practical measure.',
+        '**±15 cents** = noticeable, sounds "off". Most pros tune this tightly.',
+        '**±50 cents** = halfway to the next note. Definitely wrong.',
+      ],
+    },
+    { kind: 'h2', text: 'How does the tuner work?' },
+    {
+      kind: 'p',
+      text: 'Our tuner uses an algorithm called **autocorrelation**. Given a short audio buffer (about 25 ms of signal), the tuner asks: "what is the smallest time-shift τ where the buffer matches itself?" That shift τ is the **fundamental period** of the signal; pitch = 1 / τ.',
+    },
+    {
+      kind: 'p',
+      text: 'Concretely, it computes c[i] = Σ buf[j] × buf[j+i] for each candidate lag i, then finds the i that maximizes c. Periodic signals (like a steady guitar note) have a sharp peak at i = one period. Then we convert period to Hz, find the nearest semitone, and compute how many cents off you are.',
+    },
+    {
+      kind: 'callout',
+      flavor: 'tip',
+      title: 'Why autocorrelation over FFT?',
+      text: 'You might think you could just find the peak of the FFT. The catch: on a guitar note, the loudest peak is often the 2nd or 3rd harmonic, not the fundamental — especially through distortion. Autocorrelation operates in the time domain and locks onto the fundamental period directly, which is much more robust.',
+    },
+    { kind: 'h2', text: 'Using the tuner' },
+    {
+      kind: 'p',
+      text: 'In the Lab, click **Show tuner** above the chain. Play a single string. The tuner shows the closest note + how many cents off you are. The needle is green when you\'re within ±5 cents. If you\'re flat, tighten the string; if sharp, loosen it.',
+    },
+    {
+      kind: 'p',
+      text: 'The tuner reads the DRY signal (before any effects) — this matters because heavy distortion can confuse pitch detection. It also throttles to 10 readings per second to save CPU.',
+    },
+    {
+      kind: 'callout',
+      flavor: 'tip',
+      title: 'Tuning order',
+      text: 'Best practice: tune from low E up. After tuning, sanity-check with a fretted note (e.g., 5th fret of the low E should match open A). Bending strings, vibrato, and aggressive picking all stretch the string and pull pitch sharp — tune AFTER your guitar has settled into playing temperature for a minute.',
+    },
+  ],
+};
+
 const goingLive: Chapter = {
   id: 'going-live',
   title: 'Going Live',
   description:
     'How to plug your real guitar in and translate everything you\'ve learned to your physical Headrush.',
-  lessons: [lessonLiveInput],
+  lessons: [lessonLiveInput, lessonTuning],
 };
 
 export const CURRICULUM: Chapter[] = [foundations, buildingBlocks, goingLive];

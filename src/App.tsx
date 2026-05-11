@@ -10,6 +10,7 @@ import { LessonPanel } from './components/LessonPanel';
 import { PresetBar } from './components/PresetBar';
 import { SignalChain } from './components/SignalChain';
 import { SourceSelector } from './components/SourceSelector';
+import { Tuner } from './components/Tuner';
 import { Visualizer } from './components/Visualizer';
 import type { Preset } from './data/presets';
 import type { LessonDemo } from './lessons/types';
@@ -78,6 +79,7 @@ export default function App() {
   const [source, setSource] = useState<SourceKind>('synth');
   const [inputDb, setInputDb] = useState(0);
   const [pickupId, setPickupId] = useState<PickupId>('strat-bridge');
+  const [showTuner, setShowTuner] = useState(false);
 
   useEffect(() => {
     engine.setChain(chain);
@@ -272,6 +274,21 @@ export default function App() {
                 pickupId={pickupId}
                 onPickupChange={handlePickupChange}
               />
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowTuner((s) => !s)}
+                  className={`text-xs px-3 py-1.5 rounded border transition-colors ${
+                    showTuner
+                      ? 'border-accent-amber text-accent-amber bg-amber-500/10'
+                      : 'border-bg-600 text-zinc-400 hover:text-zinc-200 bg-bg-800'
+                  }`}
+                >
+                  {showTuner ? 'Hide tuner' : 'Show tuner'}
+                </button>
+              </div>
+
+              {showTuner ? <Tuner running={started} /> : null}
 
               <PresetBar
                 onLoad={handleLoadPreset}

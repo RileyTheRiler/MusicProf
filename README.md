@@ -54,6 +54,9 @@ Switch between them with the tabs in the header.
   chain, side-by-side. When a block is selected, a **second panel** appears
   showing the signal AT THE INPUT and AT THE OUTPUT of that block —
   literally watch each block do its work in real time.
+- **Tuner:** toggle on a chromatic tuner with autocorrelation-based pitch
+  detection. Note + cents needle, recognizes open-string notes in standard
+  tuning, throttled to 10 Hz for low CPU.
 - **Lesson panel:** TL;DR + what-it-does + physics + signal impact + Headrush
   Prime mapping + per-knob tips, all updating with the currently-selected block.
 
@@ -68,9 +71,7 @@ auto-play a relevant chord or note. Current chapters:
   Reading the Signal at Each Stage
 - **Effects & Tone-Building** (4 lessons): Time-Based Effects · The
   Modulation Family · Cabs and Impulse Responses · Building a Tone From Scratch
-- **Going Live** (1 lesson): Plug In Your Real Guitar — full audio-interface
-  walkthrough and the workflow for transferring a tone you designed here to
-  your physical Headrush.
+- **Going Live** (2 lessons): Plug In Your Real Guitar · Tuning
 
 ## Project layout
 
@@ -127,9 +128,8 @@ src/
 
 - Convolution-based cabinet IRs using **real** recordings (currently
   synthesized; ship a couple of CC-0 IRs for ultimate authenticity)
-- More lessons: pickups deep dive, recording / mixing context, music theory
-  basics for the guitarist
+- More lessons: recording / mixing context, music theory basics
 - Tap-tempo + tempo-synced delay
-- Tuner block (useful with live input)
 - MIDI in for foot-switch / expression-pedal control
 - Import/export user presets (JSON, share with friends)
+- A/B compare two chains side-by-side
