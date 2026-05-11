@@ -1,6 +1,7 @@
 import * as Tone from 'tone';
 import type { ChainBlock, EffectInstance } from '../types';
 import { effectDefinitions } from './effects';
+import { PICKUPS, PickupFilter, type PickupId } from './pickups';
 import { GuitarVoice } from './voice';
 
 export type SourceKind = 'synth' | 'live';
@@ -19,7 +20,9 @@ class AudioEngine {
 
   private voice: GuitarVoice | null = null;
   private liveInput: Tone.UserMedia | null = null;
+  private pickup: PickupFilter | null = null;
   private inputGain: Tone.Gain | null = null;
+  private pickupId: PickupId = 'strat-bridge';
   private master: Tone.Gain | null = null;
   private chainHead: Tone.Gain | null = null;
   private chainTail: Tone.Gain | null = null;
@@ -58,6 +61,9 @@ class AudioEngine {
   getLiveDeviceId(): string | null {
     return this.liveDeviceId;
   }
+  getPickupId(): PickupId {
+    return this.pickupId;
+  }
 
   async start() {
     if (this.started) return;
@@ -66,7 +72,12 @@ class AudioEngine {
     this.voice = new GuitarVoice(8);
     this.master = new Tone.Gain(0.85);
 
-    // inputGain sits BETWEEN the source (synth/live) and preTap. Lets the user
+    // Pickup model sits at the very front — applies pickup coloration to
+    // either the synth voice or live input.
+    this.pickup = new PickupFilter();
+    this.pickup.setModel(PICKUPS[this.pickupId]);
+
+    // inputGain sits BETWEEN the pickup and preTap. Lets the user
     // trim a hot or quiet input source independent of master volume.
     this.inputGain = new Tone.Gain(1);
     this.preTap = new Tone.Gain(1);
@@ -88,8 +99,9 @@ class AudioEngine {
     this.selInFFT.smoothing = 0.6;
     this.selOutFFT.smoothing = 0.6;
 
-    // Default source is the synth voice.
-    this.voice.output.connect(this.inputGain);
+    // Default source is the synth voice -> pickup filter -> inputGain.
+    this.voice.output.connect(this.pickup.input);
+    this.pickup.output.connect(this.inputGain);
     this.inputGain.connect(this.preTap);
     this.preTap.connect(this.preWave);
     this.preTap.connect(this.preFFT);
@@ -114,7 +126,7 @@ class AudioEngine {
    */
   async useLiveInput(deviceId?: string): Promise<void> {
     if (!this.started) await this.start();
-    if (!this.inputGain || !this.voice) return;
+    if (!this.inputGain || !this.voice || !this.pickup) return;
 
     // Disconnect the synth from the input chain so we don't double-up.
     this.voice.output.disconnect();
@@ -133,20 +145,23 @@ class AudioEngine {
       // Permission denied or no device — revert to synth source.
       this.liveInput.dispose();
       this.liveInput = null;
-      this.voice.output.connect(this.inputGain);
+      this.voice.output.connect(this.pickup.input);
       this.source = 'synth';
       this.notify();
       throw e;
     }
-    this.liveInput.connect(this.inputGain);
+    this.liveInput.connect(this.pickup.input);
     this.source = 'live';
     this.liveDeviceId = this.liveInput.deviceId ?? null;
-    this.notify();
+    // When the user plugs in a real guitar, default the pickup model to
+    // "Flat" — their guitar already has a real pickup; adding another
+    // pickup filter on top would be confusing coloration by default.
+    this.setPickupModel('flat');
   }
 
   /** Switch back to the synthesized guitar voice (close live mic). */
   useSynthInput(): void {
-    if (!this.inputGain || !this.voice) return;
+    if (!this.inputGain || !this.voice || !this.pickup) return;
     if (this.liveInput) {
       this.liveInput.close();
       this.liveInput.disconnect();
@@ -154,9 +169,22 @@ class AudioEngine {
       this.liveInput = null;
     }
     this.voice.output.disconnect();
-    this.voice.output.connect(this.inputGain);
+    this.voice.output.connect(this.pickup.input);
     this.source = 'synth';
     this.liveDeviceId = null;
+    // Restore a default voicing for the synth source.
+    if (this.pickupId === 'flat') {
+      this.setPickupModel('strat-bridge');
+    } else {
+      this.notify();
+    }
+  }
+
+  setPickupModel(id: PickupId): void {
+    this.pickupId = id;
+    if (this.pickup) {
+      this.pickup.setModel(PICKUPS[id]);
+    }
     this.notify();
   }
 

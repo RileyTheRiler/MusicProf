@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import { engine, enumerateAudioInputs } from '../audio/engine';
+import { PICKUP_LIST, PICKUPS, type PickupId } from '../audio/pickups';
 
 interface Props {
   source: 'synth' | 'live';
   onSourceChange: () => void; // signal that source changed; engine has up-to-date state
   inputDb: number;
   onInputDbChange: (db: number) => void;
+  pickupId: PickupId;
+  onPickupChange: (id: PickupId) => void;
 }
 
 export function SourceSelector({
@@ -13,6 +16,8 @@ export function SourceSelector({
   onSourceChange,
   inputDb,
   onInputDbChange,
+  pickupId,
+  onPickupChange,
 }: Props) {
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>('');
@@ -147,6 +152,26 @@ export function SourceSelector({
       {error ? (
         <div className="text-xs text-red-400 leading-relaxed">{error}</div>
       ) : null}
+
+      <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-bg-800">
+        <span className="text-[10px] uppercase tracking-wider text-zinc-500">
+          Pickup
+        </span>
+        <select
+          value={pickupId}
+          onChange={(e) => onPickupChange(e.target.value as PickupId)}
+          className="bg-bg-800 border border-bg-600 rounded px-2 py-1 text-sm text-zinc-200 flex-1 min-w-0"
+        >
+          {PICKUP_LIST.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.label}
+            </option>
+          ))}
+        </select>
+        <span className="text-[11px] text-zinc-500 max-w-[28rem] leading-snug">
+          {PICKUPS[pickupId].description}
+        </span>
+      </div>
 
       {source === 'live' ? (
         <div className="text-[11px] text-zinc-500 leading-relaxed">

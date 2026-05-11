@@ -27,6 +27,10 @@ Switch between them with the tabs in the header.
   or your **real guitar via an audio interface** — switch in the "Input source"
   panel. Plug in a 1/4" cable, grant mic permission, pick your device, set the
   input gain, and play through the same chain.
+- **Pickup model:** 8 pickup voicings (Strat bridge/middle/neck, Tele
+  bridge/neck, P90, Humbucker bridge/neck, Flat) applied at the very front
+  of the chain. A/B "what would my Tele sound like as a Les Paul" through
+  any chain.
 - **Working effect blocks (real DSP) — full catalog implemented:**
   - Noise Gate, Studio Compressor
   - Wah (manual + auto-sweep)
@@ -59,8 +63,8 @@ Read-through lessons that build understanding progressively. Each lesson has
 "Try this" demos that load a specific chain configuration into the Lab and
 auto-play a relevant chord or note. Current chapters:
 
-- **Foundations** (6 lessons): How Sound Works · The Electric Guitar Signal ·
-  What's a Signal Chain · Why Order Matters · Gain Staging ·
+- **Foundations** (7 lessons): How Sound Works · The Electric Guitar Signal ·
+  Pickups Deep Dive · What's a Signal Chain · Why Order Matters · Gain Staging ·
   Reading the Signal at Each Stage
 - **Effects & Tone-Building** (4 lessons): Time-Based Effects · The
   Modulation Family · Cabs and Impulse Responses · Building a Tone From Scratch

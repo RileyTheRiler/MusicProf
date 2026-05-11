@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { engine } from './audio/engine';
 import type { SourceKind } from './audio/engine';
 import { effectDefinitions } from './audio/effects';
+import type { PickupId } from './audio/pickups';
 import { ChordPicker } from './components/ChordPicker';
 import { Classroom } from './components/Classroom';
 import { EffectPalette } from './components/EffectPalette';
@@ -76,6 +77,7 @@ export default function App() {
   const [masterDb, setMasterDb] = useState(-6);
   const [source, setSource] = useState<SourceKind>('synth');
   const [inputDb, setInputDb] = useState(0);
+  const [pickupId, setPickupId] = useState<PickupId>('strat-bridge');
 
   useEffect(() => {
     engine.setChain(chain);
@@ -144,6 +146,12 @@ export default function App() {
     // Pull updated state from engine (which is the source of truth for
     // whether mic permission was granted etc.)
     setSource(engine.getSource());
+    setPickupId(engine.getPickupId());
+  };
+
+  const handlePickupChange = (id: PickupId) => {
+    setPickupId(id);
+    engine.setPickupModel(id);
   };
 
   const handleLoadPreset = (preset: Preset) => {
@@ -261,6 +269,8 @@ export default function App() {
                 onSourceChange={handleSourceChange}
                 inputDb={inputDb}
                 onInputDbChange={handleInputDb}
+                pickupId={pickupId}
+                onPickupChange={handlePickupChange}
               />
 
               <PresetBar

@@ -779,6 +779,106 @@ const lessonBuildingTone: Lesson = {
   ],
 };
 
+const lessonPickupsDeepDive: Lesson = {
+  id: 'pickups-deep-dive',
+  title: 'Pickups Deep Dive',
+  subtitle:
+    'Why a Strat sounds like a Strat: single-coil vs humbucker electrical physics, and what each pickup does to your tone.',
+  estMinutes: 7,
+  body: [
+    {
+      kind: 'p',
+      text: 'The single biggest factor in your guitar\'s tone — bigger than pedals, bigger than amp choice for "what guitar do I sound like" — is the pickup. A Stratocaster bridge single-coil into a clean amp will never sound like a Les Paul humbucker into the same amp, no matter what knob tweaks you do. The pickups are doing too much.',
+    },
+    { kind: 'h2', text: 'A pickup is an LC circuit' },
+    {
+      kind: 'p',
+      text: 'Electrically, a pickup is three things wired together: an **inductor** (the thousands of turns of fine wire wrapped around the magnet), a **capacitance** (the coil\'s self-capacitance plus the cable plus the volume/tone pot), and some **resistance** (DC resistance of the coil). That\'s a classic RLC circuit — a damped resonant oscillator.',
+    },
+    {
+      kind: 'p',
+      text: 'An RLC circuit has a **resonant frequency** where it amplifies the input signal — a peak in the frequency response. For a guitar pickup, that peak typically sits in the upper midrange (2–5 kHz). Everything below the peak passes through roughly flat; everything above the peak rolls off steeply.',
+    },
+    {
+      kind: 'callout',
+      flavor: 'info',
+      title: 'The math',
+      text: 'Resonant frequency fr = 1 / (2π × √(LC)). A typical single-coil has inductance L ≈ 2.5 H. With cable capacitance C ≈ 500 pF, that gives fr ≈ 4.5 kHz. A typical humbucker has L ≈ 5 H, so fr ≈ 3.2 kHz with the same cable. That difference in resonant frequency is the BIGGEST audible difference between the two pickup types.',
+    },
+    { kind: 'h2', text: 'Single-coils vs humbuckers' },
+    {
+      kind: 'list',
+      items: [
+        '**Single-coil** (Strat, Tele): one coil. Lower inductance → resonant peak around 4–5 kHz → bright, clear, dynamic. Picks up 60 Hz hum from any nearby AC electrical equipment.',
+        '**Humbucker** (Les Paul, SG, 335): two coils wired with reversed magnets and reversed wiring. Their string signals reinforce; any environmental hum cancels (hence "hum-bucker"). The two coils in series have ~2× the inductance → resonant peak around 2.5–3 kHz → darker, mid-richer, hotter output. No hum.',
+        '**P90**: a single coil with a wider/flatter geometry. More turns than a Strat-style single, but only one coil. Inductance lands between Strat and humbucker → resonant peak ~3 kHz. Fatter than a single-coil, brighter than a humbucker. Punk rock, Mick Ronson, Leslie West.',
+      ],
+    },
+    {
+      kind: 'demo',
+      demo: {
+        label: 'A/B: same chord, three pickup types',
+        description:
+          'Plain clean Fender amp + cab. After loading, open the Input source panel above the chain and try changing the Pickup dropdown: Strat Bridge → Humbucker Bridge → P90. Same chord, dramatically different tones, with only the pickup model changing.',
+        chain: [
+          {
+            defId: 'amp-fender-clean',
+            bypass: false,
+            paramValues: {
+              gain: 4,
+              bass: 2,
+              mid: 0,
+              treble: 3,
+              presence: 1,
+              sag: 2,
+              volume: 0,
+            },
+          },
+          {
+            defId: 'cab-tweed',
+            bypass: false,
+            paramValues: { lowCut: 80, highCut: 6500, air: 1, mix: 1 },
+          },
+        ],
+        play: { kind: 'chord', notes: ['C3', 'E3', 'G3', 'C4', 'E4'] },
+      },
+    },
+    { kind: 'h2', text: 'Position matters too' },
+    {
+      kind: 'p',
+      text: 'A given pickup\'s position under the string also shapes its tone, because the string vibrates with DIFFERENT amplitude at different points along its length. A node in the middle of the string and an antinode near the bridge means:',
+    },
+    {
+      kind: 'list',
+      items: [
+        '**Bridge pickup** — close to the string\'s anchored end. The string moves least there (small overall amplitude) but with the SHARPEST motion (lots of high-frequency content). Result: bright, cutting, treble-forward tone. Good for cutting through a band mix, for rhythm, for cleans that need bite.',
+        '**Neck pickup** — close to the 12th-fret antinode. The string moves the MOST there with BROADER motion (less high frequency, more low/mid). Result: warm, dark, "vocal" tone. Good for solos, jazz, ballads.',
+        '**Middle pickup** (Strat) — in between. Slightly darker than bridge, slightly brighter than neck.',
+        '**Quack** — combining two pickups (Strat positions 2 and 4) creates phase relationships at certain frequencies that cause notches — the iconic "out of phase" sound used by Mark Knopfler and John Mayer.',
+      ],
+    },
+    { kind: 'h2', text: 'What pickups do NOT do' },
+    {
+      kind: 'p',
+      text: 'A few myths to dispel:',
+    },
+    {
+      kind: 'list',
+      items: [
+        '**Pickups don\'t "add sustain"** — sustain comes from the string and the guitar\'s mass. A pickup just LISTENS, it doesn\'t feed back energy.',
+        '**Pickup magnets don\'t "color" tone much** — magnet type (Alnico II vs V vs ceramic) matters less than the coil\'s inductance/capacitance. Magnet type affects the magnetic field strength under the string, which subtly affects sustain and dynamics but not "tone" the way the coil shape does.',
+        '**Active pickups (EMG, Fishman Fluence) are different** — they have an onboard preamp that flattens the natural resonant peak, giving a "linear" output. Sounds modern and consistent; loses the natural resonance personality.',
+      ],
+    },
+    {
+      kind: 'callout',
+      flavor: 'tip',
+      title: 'In this app',
+      text: 'The pickup model is applied to BOTH the synthesized voice and live input. For synth: it makes the otherwise-generic Karplus-Strong source sound like a specific guitar. For live input: defaults to "Flat" since your real guitar already has a real pickup — but you can layer one on to hear what a single-coil-style EQ does to your humbucker tone (basically a coloration effect at that point).',
+    },
+  ],
+};
+
 const lessonReadingTheSignal: Lesson = {
   id: 'reading-the-signal',
   title: 'Reading the Signal at Each Stage',
@@ -864,6 +964,7 @@ const foundations: Chapter = {
   lessons: [
     lessonSound101,
     lessonGuitarSignal,
+    lessonPickupsDeepDive,
     lessonSignalChain,
     lessonOrderMatters,
     lessonGainStaging,
