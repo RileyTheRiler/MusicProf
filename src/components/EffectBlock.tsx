@@ -1,6 +1,6 @@
 import type { ChainBlock, EffectDefinition } from '../types';
 import { categoryColors, categoryLabels } from '../audio/effects';
-import { Knob } from './Knob';
+import { ParamControl } from './ParamControl';
 
 interface Props {
   block: ChainBlock;
@@ -109,20 +109,16 @@ export function EffectBlock({
       </button>
 
       <div className="grid grid-cols-2 gap-3">
-        {def.params.map((p) => (
-          <Knob
-            key={p.id}
-            label={p.label}
-            value={block.paramValues[p.id] ?? p.default}
-            min={p.min}
-            max={p.max}
-            step={p.step}
-            unit={p.unit}
-            curve={p.curve}
-            description={p.description}
-            onChange={(v) => onParam(p.id, v)}
-          />
-        ))}
+        {def.params
+          .filter((p) => p.type !== 'hidden')
+          .map((p) => (
+            <ParamControl
+              key={p.id}
+              param={p}
+              value={block.paramValues[p.id] ?? p.default}
+              onChange={(v) => onParam(p.id, v)}
+            />
+          ))}
       </div>
     </div>
   );

@@ -1128,6 +1128,116 @@ const lessonCabsAndIRs: Lesson = {
   ],
 };
 
+const lessonTempoSync: Lesson = {
+  id: 'tempo-sync',
+  title: 'Tempo, BPM, and Synced Delays',
+  subtitle:
+    'Why a 380ms delay sometimes sounds magical and sometimes sounds wrong — and how to lock your delay to the music.',
+  estMinutes: 5,
+  body: [
+    {
+      kind: 'p',
+      text: 'A delay set to an arbitrary millisecond value sounds OK on a single chord, but the moment you play a *song*, the delays either lock in with the rhythm or fight it. Locking the delay to the song\'s tempo turns delay from "an effect" into "a rhythmic instrument".',
+    },
+    { kind: 'h2', text: 'BPM — beats per minute' },
+    {
+      kind: 'p',
+      text: 'Tempo is measured in beats per minute (BPM). Most rock songs sit around 100–140 BPM. Each beat = 60 / BPM seconds. So:',
+    },
+    {
+      kind: 'list',
+      items: [
+        '**60 BPM**: one beat per second. Heart rate, slow ballad.',
+        '**120 BPM**: half-second per beat. The most common pop/rock tempo.',
+        '**140 BPM**: ~430 ms per beat. Punk, fast rock.',
+        '**174 BPM**: ~345 ms per beat. Drum & bass standard tempo.',
+      ],
+    },
+    { kind: 'h2', text: 'Subdivisions' },
+    {
+      kind: 'p',
+      text: 'A beat can be subdivided into smaller rhythmic values:',
+    },
+    {
+      kind: 'list',
+      items: [
+        '**Quarter note (1/4)** = 1 beat. One delay tap per beat. The default, the safest "I want delay in time".',
+        '**Dotted eighth (dot 1/8)** = 0.75 beats. Three taps every two beats. This is the iconic U2 / Police / Edge sound — it creates polyrhythmic cross-talk against the song\'s downbeats.',
+        '**Eighth note (1/8)** = 0.5 beats. Two taps per beat. Busier, more rhythmic.',
+        '**Sixteenth note (1/16)** = 0.25 beats. Four taps per beat. Approaches "echo wash" territory.',
+        '**Half note (1/2)** = 2 beats. Slow, atmospheric — pair with reverb for ambient washes.',
+      ],
+    },
+    { kind: 'h2', text: 'How to use the tap tempo' },
+    {
+      kind: 'p',
+      text: 'In the header, click **Tap** in time with the music — four taps is usually enough to lock in. The BPM display updates. Alternatively click the BPM number and type it in directly.',
+    },
+    {
+      kind: 'p',
+      text: 'Then click your delay block in the chain. Flip the **Sync** toggle to "Sync". Pick a **Subdivision** from the pill row. The Time knob is now ignored — delay time is computed from BPM × subdivision.',
+    },
+    {
+      kind: 'callout',
+      flavor: 'tip',
+      title: 'The "Edge sound"',
+      text: 'Brian Eno + The Edge\'s trick: set delay to dotted-eighth, feedback around 0.55–0.65, mix 40–50%. Now play strict eighth notes — the delay\'s dotted-eighth repeats land between your notes, weaving a constant 16th-note rhythm out of what your fingers are playing. Try it on "Where the Streets Have No Name".',
+    },
+    {
+      kind: 'demo',
+      demo: {
+        label: 'Try: dotted-eighth delay at 120 BPM',
+        description:
+          'Loads a synced delay (dotted 1/8) plus a chimey Vox amp + Blue cab. Auto-plays a high E so you hear the dotted-eighth bounce. After loading, click the delay block, try switching subdivision between dotted 1/8 and 1/8 to feel the rhythmic difference.',
+        chain: [
+          {
+            defId: 'amp-vox-chime',
+            bypass: false,
+            paramValues: {
+              gain: 3.5,
+              bass: 3,
+              mid: 0,
+              treble: 5,
+              presence: 3,
+              sag: 3,
+              volume: 0,
+            },
+          },
+          {
+            defId: 'cab-blue',
+            bypass: false,
+            paramValues: { lowCut: 90, highCut: 8000, air: 2, mix: 1 },
+          },
+          {
+            defId: 'delay-analog',
+            bypass: false,
+            paramValues: {
+              time: 380,
+              feedback: 0.55,
+              tone: 5500,
+              mix: 0.45,
+              sync: 1,
+              subdivision: 3, // dotted 1/8
+              tempo: 120,
+            },
+          },
+          {
+            defId: 'reverb-hall',
+            bypass: false,
+            paramValues: { size: 0.55, dampening: 7000, preDelay: 25, mix: 0.25 },
+          },
+        ],
+        play: { kind: 'note', note: 'E4', label: 'Pluck a high E' },
+      },
+    },
+    { kind: 'h2', text: 'Why does this matter?' },
+    {
+      kind: 'p',
+      text: 'Unsynced delays at the wrong tempo create rhythmic "mud" — repeats land between beats, fighting the rhythm. Sync the delay and the repeats either reinforce the song\'s pulse (quarter notes) or create deliberate counter-rhythm (dotted eighth). It\'s the same delay block in either case; the only difference is the math relating delay time to tempo.',
+    },
+  ],
+};
+
 const buildingBlocks: Chapter = {
   id: 'building-blocks',
   title: 'Effects & Tone-Building',
@@ -1137,6 +1247,7 @@ const buildingBlocks: Chapter = {
     lessonTimeEffects,
     lessonModulation,
     lessonCabsAndIRs,
+    lessonTempoSync,
     lessonBuildingTone,
   ],
 };

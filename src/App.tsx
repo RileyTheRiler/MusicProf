@@ -10,6 +10,7 @@ import { LessonPanel } from './components/LessonPanel';
 import { PresetBar } from './components/PresetBar';
 import { SignalChain } from './components/SignalChain';
 import { SourceSelector } from './components/SourceSelector';
+import { TapTempo } from './components/TapTempo';
 import { Tuner } from './components/Tuner';
 import { Visualizer } from './components/Visualizer';
 import type { Preset } from './data/presets';
@@ -80,6 +81,7 @@ export default function App() {
   const [inputDb, setInputDb] = useState(0);
   const [pickupId, setPickupId] = useState<PickupId>('strat-bridge');
   const [showTuner, setShowTuner] = useState(false);
+  const [bpm, setBpm] = useState(120);
 
   useEffect(() => {
     engine.setChain(chain);
@@ -154,6 +156,11 @@ export default function App() {
   const handlePickupChange = (id: PickupId) => {
     setPickupId(id);
     engine.setPickupModel(id);
+  };
+
+  const handleBpmChange = (next: number) => {
+    setBpm(next);
+    engine.setTempo(next);
   };
 
   const handleLoadPreset = (preset: Preset) => {
@@ -231,6 +238,7 @@ export default function App() {
             </nav>
           </div>
           <div className="flex items-center gap-3">
+            <TapTempo bpm={bpm} onChange={handleBpmChange} />
             <label className="flex items-center gap-2 text-xs text-zinc-400">
               Master
               <input

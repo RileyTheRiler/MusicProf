@@ -108,7 +108,7 @@ export function LessonPanel({ block, def }: Props) {
         <Section title="Knob tips">
           <div className="space-y-2">
             {def.params
-              .filter((p) => def.lesson.paramTips[p.id])
+              .filter((p) => def.lesson.paramTips[p.id] && p.type !== 'hidden')
               .map((p) => {
                 const v = block?.paramValues[p.id] ?? p.default;
                 return (

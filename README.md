@@ -57,6 +57,10 @@ Switch between them with the tabs in the header.
 - **Tuner:** toggle on a chromatic tuner with autocorrelation-based pitch
   detection. Note + cents needle, recognizes open-string notes in standard
   tuning, throttled to 10 Hz for low CPU.
+- **Tap Tempo + synced delays:** tap the **Tap** button in the header in time
+  with the music to set the global BPM. Click the delay block, flip **Sync**
+  to on, and pick a **Subdivision** (1/2, dot 1/4, 1/4, dot 1/8, 1/8, 1/16) —
+  the delay time locks to the tempo math.
 - **Lesson panel:** TL;DR + what-it-does + physics + signal impact + Headrush
   Prime mapping + per-knob tips, all updating with the currently-selected block.
 
@@ -69,8 +73,9 @@ auto-play a relevant chord or note. Current chapters:
 - **Foundations** (7 lessons): How Sound Works · The Electric Guitar Signal ·
   Pickups Deep Dive · What's a Signal Chain · Why Order Matters · Gain Staging ·
   Reading the Signal at Each Stage
-- **Effects & Tone-Building** (4 lessons): Time-Based Effects · The
-  Modulation Family · Cabs and Impulse Responses · Building a Tone From Scratch
+- **Effects & Tone-Building** (5 lessons): Time-Based Effects · The
+  Modulation Family · Cabs and Impulse Responses · Tempo, BPM, and Synced
+  Delays · Building a Tone From Scratch
 - **Going Live** (2 lessons): Plug In Your Real Guitar · Tuning
 
 ## Project layout
@@ -129,7 +134,6 @@ src/
 - Convolution-based cabinet IRs using **real** recordings (currently
   synthesized; ship a couple of CC-0 IRs for ultimate authenticity)
 - More lessons: recording / mixing context, music theory basics
-- Tap-tempo + tempo-synced delay
 - MIDI in for foot-switch / expression-pedal control
 - Import/export user presets (JSON, share with friends)
 - A/B compare two chains side-by-side

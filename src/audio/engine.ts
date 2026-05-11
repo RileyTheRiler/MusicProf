@@ -48,6 +48,7 @@ class AudioEngine {
   private instances: Map<string, EffectInstance> = new Map();
   private source: SourceKind = 'synth';
   private liveDeviceId: string | null = null;
+  private tempo = 120;
 
   private listeners = new Set<() => void>();
 
@@ -247,6 +248,30 @@ class AudioEngine {
     if (this.master) this.master.gain.value = Tone.dbToGain(db);
   }
 
+  /**
+   * Update the global tempo (BPM). Any block whose definition includes a
+   * 'tempo' param will receive the new value via setParam — used by the
+   * delay block to compute synced delay time. Tempo is also stored in
+   * each block's paramValues so it survives chain rebuilds.
+   */
+  setTempo(bpm: number) {
+    this.tempo = bpm;
+    for (const block of this.blocks) {
+      const def = effectDefinitions[block.defId];
+      if (!def) continue;
+      const hasTempo = def.params.some((p) => p.id === 'tempo');
+      if (!hasTempo) continue;
+      block.paramValues.tempo = bpm;
+      const inst = this.instances.get(block.id);
+      if (inst) inst.setParam('tempo', bpm);
+    }
+    this.notify();
+  }
+
+  getTempo(): number {
+    return this.tempo;
+  }
+
   playNote(note: string, duration: Tone.Unit.Time = '4n') {
     if (!this.started || !this.voice) return;
     this.voice.trigger(note, duration);
@@ -378,9 +403,12 @@ class AudioEngine {
         inst = def.create();
         this.instances.set(block.id, inst);
       }
-      // Apply params
+      // Apply params (tempo is always pushed from the engine's current value,
+      // not whatever was saved with the block — tempo is a global setting).
       for (const p of def.params) {
-        const v = block.paramValues[p.id] ?? p.default;
+        let v = block.paramValues[p.id] ?? p.default;
+        if (p.id === 'tempo') v = this.tempo;
+        block.paramValues[p.id] = v;
         inst.setParam(p.id, v);
       }
       inst.setBypass(block.bypass);

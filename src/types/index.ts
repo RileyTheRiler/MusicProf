@@ -14,6 +14,11 @@ export type EffectCategory =
   | 'reverb'
   | 'output';
 
+export interface EnumOption {
+  value: number;
+  label: string;
+}
+
 export interface EffectParamSpec {
   id: string;
   label: string;
@@ -25,6 +30,15 @@ export interface EffectParamSpec {
   /** Display curve for the knob; doesn't affect storage (always linear value). */
   curve?: 'linear' | 'log';
   description: string;
+  /**
+   * Control type. Defaults to 'number' (knob). Use 'toggle' for booleans
+   * (encoded as 0/1) and 'enum' for discrete choices (encoded as integer
+   * index into `options`). Use 'hidden' for params managed by the engine
+   * (e.g. global tempo) that shouldn't have a user-facing control.
+   */
+  type?: 'number' | 'toggle' | 'enum' | 'hidden';
+  /** Required when type === 'enum' or type === 'toggle'. */
+  options?: EnumOption[];
 }
 
 export interface EffectLesson {
