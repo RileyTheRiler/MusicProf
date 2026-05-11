@@ -186,6 +186,11 @@ export default function App() {
     ? effectDefinitions[selectedBlock.defId] ?? null
     : null;
 
+  // Tell the engine which block to tap with the per-block analyzers.
+  useEffect(() => {
+    engine.setSelectedBlock(selectedId);
+  }, [selectedId]);
+
   return (
     <div className="min-h-screen bg-bg-950 text-zinc-200">
       <header className="border-b border-bg-700 bg-bg-900 sticky top-0 z-10">
@@ -277,7 +282,10 @@ export default function App() {
                 onReorder={updateChain}
               />
 
-              <Visualizer running={started} />
+              <Visualizer
+                running={started}
+                selectedBlockLabel={selectedDef ? selectedDef.displayName : null}
+              />
 
               <div className="bg-bg-900 border border-bg-700 rounded p-4">
                 <h2 className="text-sm uppercase tracking-wider text-zinc-400 mb-3">

@@ -46,7 +46,10 @@ Switch between them with the tabs in the header.
   Modern Metal, Ambient Lead, Funk Clean) PLUS save your own — current chain
   saves to localStorage, survives reloads, click to recall.
 - **Chain editor:** add, remove, reorder, and bypass blocks.
-- **Visualizer:** dry vs. wet waveform + log-frequency spectrum, side-by-side.
+- **Visualizer:** dry vs. wet waveform + log-frequency spectrum for the whole
+  chain, side-by-side. When a block is selected, a **second panel** appears
+  showing the signal AT THE INPUT and AT THE OUTPUT of that block —
+  literally watch each block do its work in real time.
 - **Lesson panel:** TL;DR + what-it-does + physics + signal impact + Headrush
   Prime mapping + per-knob tips, all updating with the currently-selected block.
 
@@ -56,8 +59,9 @@ Read-through lessons that build understanding progressively. Each lesson has
 "Try this" demos that load a specific chain configuration into the Lab and
 auto-play a relevant chord or note. Current chapters:
 
-- **Foundations** (5 lessons): How Sound Works · The Electric Guitar Signal ·
-  What's a Signal Chain · Why Order Matters · Gain Staging
+- **Foundations** (6 lessons): How Sound Works · The Electric Guitar Signal ·
+  What's a Signal Chain · Why Order Matters · Gain Staging ·
+  Reading the Signal at Each Stage
 - **Effects & Tone-Building** (4 lessons): Time-Based Effects · The
   Modulation Family · Cabs and Impulse Responses · Building a Tone From Scratch
 - **Going Live** (1 lesson): Plug In Your Real Guitar — full audio-interface

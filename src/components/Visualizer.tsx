@@ -4,21 +4,29 @@ import { useAnimationFrame } from '../hooks/useAnimationFrame';
 
 interface Props {
   running: boolean;
+  /**
+   * If provided, draw a SECOND panel showing the signal at the input and
+   * output of the named block, along with its display label. Pass null to
+   * only show the whole-chain DRY vs WET view.
+   */
+  selectedBlockLabel: string | null;
 }
 
 /**
- * Side-by-side oscilloscope (waveform) and spectrum (FFT) for the dry input
- * vs the post-chain output, drawn into a single canvas.
+ * Two stacked panels:
  *
- *   ┌─────────────────────┬─────────────────────┐
- *   │   DRY waveform      │  WET waveform       │
- *   ├─────────────────────┼─────────────────────┤
- *   │   DRY spectrum      │  WET spectrum       │
- *   └─────────────────────┴─────────────────────┘
+ *   ┌──────────────────────────────────────────┐
+ *   │ DRY waveform  │  WET waveform            │
+ *   │ DRY spectrum  │  WET spectrum            │  whole chain
+ *   ├───────────────┼──────────────────────────┤
+ *   │ block IN wf   │  block OUT wf            │
+ *   │ block IN sp   │  block OUT sp            │  selected block (optional)
+ *   └──────────────────────────────────────────┘
  */
-export function Visualizer({ running }: Props) {
+export function Visualizer({ running, selectedBlockLabel }: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const dprRef = useRef(1);
+  const showBlock = !!selectedBlockLabel;
 
   useEffect(() => {
     const c = canvasRef.current;
@@ -34,7 +42,7 @@ export function Visualizer({ running }: Props) {
     const ro = new ResizeObserver(resize);
     ro.observe(c);
     return () => ro.disconnect();
-  }, []);
+  }, [showBlock]);
 
   useAnimationFrame(() => {
     const c = canvasRef.current;
@@ -44,48 +52,171 @@ export function Visualizer({ running }: Props) {
     const W = c.width;
     const H = c.height;
     const halfW = W / 2;
-    const halfH = H / 2;
+    const dpr = dprRef.current;
 
     ctx.fillStyle = '#0a0a0c';
     ctx.fillRect(0, 0, W, H);
 
-    // Grid + dividers
+    if (showBlock) {
+      // Top half: whole-chain. Bottom half: selected block.
+      drawChainPanel(ctx, 0, 0, W, H / 2, dpr, running);
+      // Divider between panels
+      ctx.strokeStyle = '#2a2a32';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, H / 2);
+      ctx.lineTo(W, H / 2);
+      ctx.stroke();
+      drawBlockPanel(ctx, 0, H / 2, W, H / 2, dpr, running, selectedBlockLabel!);
+    } else {
+      drawChainPanel(ctx, 0, 0, W, H, dpr, running);
+    }
+
+    // Center vertical divider (between left/right halves)
     ctx.strokeStyle = '#1f1f25';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(halfW, 0);
     ctx.lineTo(halfW, H);
-    ctx.moveTo(0, halfH);
-    ctx.lineTo(W, halfH);
     ctx.stroke();
-
-    if (running) {
-      const pre = engine.getPreWaveform();
-      const post = engine.getPostWaveform();
-      const preFft = engine.getPreFFT();
-      const postFft = engine.getPostFFT();
-
-      drawWaveform(ctx, pre, 0, 0, halfW, halfH, '#22d3ee');
-      drawWaveform(ctx, post, halfW, 0, halfW, halfH, '#f59e0b');
-      drawSpectrum(ctx, preFft, 0, halfH, halfW, halfH, '#22d3ee');
-      drawSpectrum(ctx, postFft, halfW, halfH, halfW, halfH, '#f59e0b');
-    }
-
-    // Labels
-    ctx.fillStyle = '#52525b';
-    ctx.font = `${10 * dprRef.current}px ui-monospace, monospace`;
-    ctx.textBaseline = 'top';
-    ctx.fillText('DRY · waveform', 6 * dprRef.current, 4 * dprRef.current);
-    ctx.fillText('WET · waveform', halfW + 6 * dprRef.current, 4 * dprRef.current);
-    ctx.fillText('DRY · spectrum', 6 * dprRef.current, halfH + 4 * dprRef.current);
-    ctx.fillText('WET · spectrum', halfW + 6 * dprRef.current, halfH + 4 * dprRef.current);
   }, true);
 
   return (
     <div className="bg-bg-900 border border-bg-700 rounded overflow-hidden">
-      <canvas ref={canvasRef} className="w-full h-64 block" />
+      <canvas
+        ref={canvasRef}
+        className={`w-full block ${showBlock ? 'h-[28rem]' : 'h-64'}`}
+      />
     </div>
   );
+}
+
+function drawChainPanel(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  dpr: number,
+  running: boolean
+) {
+  const halfW = w / 2;
+  const halfH = h / 2;
+
+  // Horizontal divider
+  ctx.strokeStyle = '#1f1f25';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(x, y + halfH);
+  ctx.lineTo(x + w, y + halfH);
+  ctx.stroke();
+
+  if (running) {
+    drawWaveform(ctx, engine.getPreWaveform(), x, y, halfW, halfH, '#22d3ee');
+    drawWaveform(
+      ctx,
+      engine.getPostWaveform(),
+      x + halfW,
+      y,
+      halfW,
+      halfH,
+      '#f59e0b'
+    );
+    drawSpectrum(
+      ctx,
+      engine.getPreFFT(),
+      x,
+      y + halfH,
+      halfW,
+      halfH,
+      '#22d3ee'
+    );
+    drawSpectrum(
+      ctx,
+      engine.getPostFFT(),
+      x + halfW,
+      y + halfH,
+      halfW,
+      halfH,
+      '#f59e0b'
+    );
+  }
+
+  ctx.fillStyle = '#52525b';
+  ctx.font = `${10 * dpr}px ui-monospace, monospace`;
+  ctx.textBaseline = 'top';
+  ctx.fillText('DRY (chain in) · wf', x + 6 * dpr, y + 4 * dpr);
+  ctx.fillText('WET (chain out) · wf', x + halfW + 6 * dpr, y + 4 * dpr);
+  ctx.fillText('DRY · spectrum', x + 6 * dpr, y + halfH + 4 * dpr);
+  ctx.fillText('WET · spectrum', x + halfW + 6 * dpr, y + halfH + 4 * dpr);
+}
+
+function drawBlockPanel(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  dpr: number,
+  running: boolean,
+  label: string
+) {
+  const halfW = w / 2;
+  const halfH = h / 2;
+
+  ctx.strokeStyle = '#1f1f25';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(x, y + halfH);
+  ctx.lineTo(x + w, y + halfH);
+  ctx.stroke();
+
+  if (running) {
+    drawWaveform(
+      ctx,
+      engine.getSelectedInWaveform(),
+      x,
+      y,
+      halfW,
+      halfH,
+      '#a78bfa'
+    );
+    drawWaveform(
+      ctx,
+      engine.getSelectedOutWaveform(),
+      x + halfW,
+      y,
+      halfW,
+      halfH,
+      '#10b981'
+    );
+    drawSpectrum(
+      ctx,
+      engine.getSelectedInFFT(),
+      x,
+      y + halfH,
+      halfW,
+      halfH,
+      '#a78bfa'
+    );
+    drawSpectrum(
+      ctx,
+      engine.getSelectedOutFFT(),
+      x + halfW,
+      y + halfH,
+      halfW,
+      halfH,
+      '#10b981'
+    );
+  }
+
+  ctx.fillStyle = '#52525b';
+  ctx.font = `${10 * dpr}px ui-monospace, monospace`;
+  ctx.textBaseline = 'top';
+  ctx.fillText(`${label} INPUT · wf`, x + 6 * dpr, y + 4 * dpr);
+  ctx.fillText(`${label} OUTPUT · wf`, x + halfW + 6 * dpr, y + 4 * dpr);
+  ctx.fillText('INPUT · spectrum', x + 6 * dpr, y + halfH + 4 * dpr);
+  ctx.fillText('OUTPUT · spectrum', x + halfW + 6 * dpr, y + halfH + 4 * dpr);
 }
 
 function drawWaveform(
@@ -132,14 +263,13 @@ function drawSpectrum(
   ctx.rect(x0, y0, w, h);
   ctx.clip();
 
-  const sampleRate = 44100; // approx; Tone uses the AudioContext's rate
+  const sampleRate = 44100;
   const nyquist = sampleRate / 2;
   const fmin = 40;
   const fmax = 16000;
   const logMin = Math.log10(fmin);
   const logMax = Math.log10(fmax);
 
-  // Vertical reference lines at musical octaves
   ctx.strokeStyle = '#1f1f25';
   ctx.lineWidth = 1;
   ctx.beginPath();
@@ -153,7 +283,6 @@ function drawSpectrum(
 
   ctx.fillStyle = color;
   const binCount = data.length;
-  // For each output column, find max bin in the corresponding freq band
   const cols = Math.floor(w);
   for (let col = 0; col < cols; col++) {
     const x = x0 + col;
@@ -172,7 +301,6 @@ function drawSpectrum(
     for (let b = binLow; b <= binHigh; b++) {
       if (data[b] > max) max = data[b];
     }
-    // dB to height: -100..0 dB -> 0..1
     const dbMin = -90;
     const dbMax = 0;
     const norm = Math.max(0, Math.min(1, (max - dbMin) / (dbMax - dbMin)));

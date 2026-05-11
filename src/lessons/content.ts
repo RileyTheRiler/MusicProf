@@ -779,6 +779,79 @@ const lessonBuildingTone: Lesson = {
   ],
 };
 
+const lessonReadingTheSignal: Lesson = {
+  id: 'reading-the-signal',
+  title: 'Reading the Signal at Each Stage',
+  subtitle:
+    'How to use the per-block scope to see exactly what each effect is doing.',
+  estMinutes: 4,
+  body: [
+    {
+      kind: 'p',
+      text: 'The visualizer at the top of the Lab shows you the signal at the BEGINNING of the chain (DRY) and at the END (WET, post-everything). That tells you the total impact of all your effects combined — but not what each one is contributing.',
+    },
+    {
+      kind: 'p',
+      text: 'Now click any block in the signal chain. The block lights up with an amber **"scope"** badge, and a second panel appears under the main visualizer showing the signal entering the block (purple) and leaving the block (green). You\'re literally watching that one block do its work.',
+    },
+    { kind: 'h2', text: 'What to look for' },
+    {
+      kind: 'list',
+      items: [
+        '**Distortion / Amp blocks**: input waveform is smooth sine-ish; output has flat tops/bottoms (clipping) AND the spectrum has new peaks at integer multiples of the fundamental (harmonics being generated).',
+        '**EQ / Cab**: waveform looks similar in and out, but the spectrum shape changes — peaks here, dips there. EQ is linear, so it can\'t create new frequencies, only reshape existing ones.',
+        '**Delay**: clean dry signal in, plus delayed repeats out. The output waveform shows the original PLUS a quieter copy starting a few hundred ms later.',
+        '**Reverb**: dry input, washed/smeared output. The output spectrum has energy in the gaps where the dry signal was silent.',
+        '**Modulation (chorus, phaser, flanger)**: input and output spectra look similar, but the output\'s spectrum SHIFTS around over time as the LFO modulates. Watch the spectrum panel — it should be visibly moving.',
+      ],
+    },
+    {
+      kind: 'callout',
+      flavor: 'tip',
+      title: 'A pedagogy trick',
+      text: 'Pick a chain (any preset). Click each block one at a time, starting from the leftmost. Play a chord. Watch how the output of one block becomes the input of the next. You\'re seeing the signal transformation cascade live. This is the kind of insight you literally cannot get from listening alone.',
+    },
+    {
+      kind: 'demo',
+      demo: {
+        label: 'Try it — load a chain and click around',
+        description:
+          'Loads the Classic Rock Lead chain. After loading, click the Overdrive block in the chain to see what it\'s doing; then click the Marshall to see how the amp transforms the OD\'s output; then click the cab to see the cab filter the amp\'s output.',
+        chain: [
+          {
+            defId: 'overdrive',
+            bypass: false,
+            paramValues: { drive: 0.25, tone: 3000, level: 3, mix: 1 },
+          },
+          {
+            defId: 'amp-marshall-crunch',
+            bypass: false,
+            paramValues: {
+              gain: 6.5,
+              bass: -2,
+              mid: 4,
+              treble: 5,
+              presence: 4,
+              sag: 4,
+              volume: 0,
+            },
+          },
+          {
+            defId: 'cab-4x12',
+            bypass: false,
+            paramValues: { lowCut: 100, highCut: 5200, air: 0, mix: 1 },
+          },
+        ],
+        play: { kind: 'chord', notes: ['E2', 'B2', 'E3', 'G3', 'B3', 'E4'] },
+      },
+    },
+    {
+      kind: 'p',
+      text: 'Two important caveats. (1) Bypassed blocks pass their input through unchanged, so input and output look identical — which is correct, that\'s what bypass means. (2) Some blocks (like the Wah\'s auto-mode) modulate over time, so the spectrum keeps moving even when nothing is "happening" musically. Stare for a few seconds before deciding what you\'re seeing.',
+    },
+  ],
+};
+
 // ----------------------------------------------------------------------------
 // Chapter assembly
 // ----------------------------------------------------------------------------
@@ -794,6 +867,7 @@ const foundations: Chapter = {
     lessonSignalChain,
     lessonOrderMatters,
     lessonGainStaging,
+    lessonReadingTheSignal,
   ],
 };
 

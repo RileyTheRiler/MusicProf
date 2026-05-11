@@ -31,6 +31,16 @@ class AudioEngine {
   private preFFT: Tone.Analyser | null = null;
   private postFFT: Tone.Analyser | null = null;
 
+  // Analyzers that tap the input and output of the user-selected block.
+  // The same physical nodes are re-routed when selection changes — they're
+  // additional destinations of the block's input/output, so they don't
+  // disturb the main signal path.
+  private selInWave: Tone.Analyser | null = null;
+  private selOutWave: Tone.Analyser | null = null;
+  private selInFFT: Tone.Analyser | null = null;
+  private selOutFFT: Tone.Analyser | null = null;
+  private selBlockId: string | null = null;
+
   private blocks: ChainBlock[] = [];
   private instances: Map<string, EffectInstance> = new Map();
   private source: SourceKind = 'synth';
@@ -70,6 +80,13 @@ class AudioEngine {
     this.postFFT = new Tone.Analyser('fft', 1024);
     this.preFFT.smoothing = 0.6;
     this.postFFT.smoothing = 0.6;
+
+    this.selInWave = new Tone.Analyser('waveform', 1024);
+    this.selOutWave = new Tone.Analyser('waveform', 1024);
+    this.selInFFT = new Tone.Analyser('fft', 1024);
+    this.selOutFFT = new Tone.Analyser('fft', 1024);
+    this.selInFFT.smoothing = 0.6;
+    this.selOutFFT.smoothing = 0.6;
 
     // Default source is the synth voice.
     this.voice.output.connect(this.inputGain);
@@ -225,6 +242,83 @@ class AudioEngine {
     return (this.postFFT?.getValue() as Float32Array) ?? null;
   }
 
+  /** Returns the waveform AT THE INPUT of the currently-selected block. */
+  getSelectedInWaveform(): Float32Array | null {
+    return (this.selInWave?.getValue() as Float32Array) ?? null;
+  }
+  /** Returns the waveform AT THE OUTPUT of the currently-selected block. */
+  getSelectedOutWaveform(): Float32Array | null {
+    return (this.selOutWave?.getValue() as Float32Array) ?? null;
+  }
+  getSelectedInFFT(): Float32Array | null {
+    return (this.selInFFT?.getValue() as Float32Array) ?? null;
+  }
+  getSelectedOutFFT(): Float32Array | null {
+    return (this.selOutFFT?.getValue() as Float32Array) ?? null;
+  }
+
+  /**
+   * Re-route the per-block analyzers to tap the input and output of the
+   * given block. Pass null to detach (in which case the per-block view will
+   * just show zeros).
+   *
+   * Connect/disconnect operates by specific destination — Web Audio nodes can
+   * fan out to multiple destinations, so adding an analyzer tap does NOT
+   * affect the main signal path.
+   */
+  setSelectedBlock(blockId: string | null) {
+    this.selBlockId = blockId;
+    this.applySelectedTaps();
+    this.notify();
+  }
+
+  getSelectedBlockId(): string | null {
+    return this.selBlockId;
+  }
+
+  /** Stored separately from rewire() so we can reuse it after rewire() too. */
+  private applySelectedTaps() {
+    if (
+      !this.selInWave ||
+      !this.selOutWave ||
+      !this.selInFFT ||
+      !this.selOutFFT
+    )
+      return;
+
+    // Disconnect from everything first. disconnect() with no args removes the
+    // analyzer's *outgoing* connections — analyzers don't connect outward
+    // (they're terminal nodes), so this is a no-op for them. To clear
+    // INCOMING connections (which is what we have), we need the source side
+    // to call disconnect(destination). Since we don't know the previous
+    // source, we instead use a defensive approach: walk every effect
+    // instance's input/output and disconnect our analyzers from each. Any
+    // that weren't connected are silently no-ops.
+    for (const inst of this.instances.values()) {
+      try {
+        inst.input.disconnect(this.selInWave);
+      } catch {/* not connected */}
+      try {
+        inst.input.disconnect(this.selInFFT);
+      } catch {/* not connected */}
+      try {
+        inst.output.disconnect(this.selOutWave);
+      } catch {/* not connected */}
+      try {
+        inst.output.disconnect(this.selOutFFT);
+      } catch {/* not connected */}
+    }
+
+    if (!this.selBlockId) return;
+    const inst = this.instances.get(this.selBlockId);
+    if (!inst) return;
+
+    inst.input.connect(this.selInWave);
+    inst.input.connect(this.selInFFT);
+    inst.output.connect(this.selOutWave);
+    inst.output.connect(this.selOutFFT);
+  }
+
   /**
    * Rebuild the audio graph: input -> [block.input -> block.output]* -> output.
    * Spawns new effect instances for new blocks; reuses existing ones; disposes
@@ -282,6 +376,10 @@ class AudioEngine {
       prev = inst.output;
     }
     prev.connect(this.chainTail!);
+
+    // The instances map may have been refreshed; re-apply the per-block taps
+    // so the analyzers stay attached to the right instance.
+    this.applySelectedTaps();
   }
 }
 

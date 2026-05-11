@@ -80,7 +80,17 @@ export function EffectBlock({
         </div>
       </div>
 
-      <div className="text-sm font-medium mb-1 text-zinc-100">{def.displayName}</div>
+      <div className="text-sm font-medium mb-1 text-zinc-100 flex items-center gap-2">
+        <span className="truncate">{def.displayName}</span>
+        {selected ? (
+          <span
+            title="The visualizer's bottom panel shows the signal at this block's input and output"
+            className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-accent-amber/20 text-accent-amber border border-accent-amber/40 flex-shrink-0"
+          >
+            scope
+          </span>
+        ) : null}
+      </div>
 
       <button
         onClick={(e) => {
