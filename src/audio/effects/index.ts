@@ -11,63 +11,17 @@ import { eqDef } from './eq';
 import { cabDef } from './cab';
 import { chorusDef } from './chorus';
 import { delayDef } from './delay';
+import { noiseGateDef } from './gate';
+import { phaserDef } from './phaser';
 import { reverbDef } from './reverb';
+import { tremoloDef } from './tremolo';
+import { wahDef } from './wah';
 
 /**
  * Catalog-only stubs for blocks we'll implement in later passes. Showing them
  * (greyed out) gives the user a complete picture of the Headrush Prime\'s
  * signal-chain real estate even before every block has audio.
  */
-const noiseGateStub: EffectDefinition = {
-  id: 'gate',
-  displayName: 'Noise Gate',
-  category: 'input',
-  shortDescription:
-    'Mutes the signal below a threshold to suppress hum and pickup hiss between notes.',
-  implemented: false,
-  params: [],
-  lesson: {
-    tldr: 'A gate is a volume control that opens when you play and closes when you don\'t.',
-    whatItDoes:
-      'A gate watches the input level. Above the threshold, it passes signal through unchanged. Below, it cuts the volume to zero (or attenuates by a set amount). Critical for high-gain rigs where pickup hum and amp hiss are otherwise audible during pauses.',
-    physics:
-      'Opposite of a compressor: instead of reducing gain when loud, it reduces gain when quiet. Attack/release/hold parameters control how fast it opens and closes.',
-    signalImpact: [
-      'Silences signal below threshold',
-      'Can chatter on slow note decay if release is too fast',
-      'Best placed early in the chain (before drive/amp) to gate noise from the source',
-    ],
-    headrushNotes:
-      'The Prime has a built-in noise gate per signal chain plus a dedicated Gate block.',
-    paramTips: {},
-  },
-};
-
-const wahStub: EffectDefinition = {
-  id: 'wah',
-  displayName: 'Wah',
-  category: 'wah',
-  shortDescription:
-    'A bandpass filter swept by an expression pedal — the iconic "wow-wah" vocal-like sound.',
-  implemented: false,
-  params: [],
-  lesson: {
-    tldr: 'A wah is a sweepable bandpass filter — the resonant peak moves between ~400 Hz and ~2 kHz as you rock the pedal.',
-    whatItDoes:
-      'A narrow, resonant bandpass filter whose center frequency is controlled by a pedal. Sweeping the filter through midrange creates a sound very similar to a human vocal "wah" because vowels are also formed by midrange resonances.',
-    physics:
-      'Originally an inductor + variable capacitor analog filter (the famous Cry Baby). Digital wahs model that response. Q (resonance) is high — a sharp peak that emphasizes a narrow band.',
-    signalImpact: [
-      'Massive midrange emphasis at the swept frequency',
-      'Heavy attenuation outside the filter band',
-      'Makes single notes almost speak/sing',
-    ],
-    headrushNotes:
-      'On the Prime, the Wah block ties to the expression pedal. Often paired with overdrive — the wah\'s peak is so sharp it can self-oscillate when overdriven.',
-    paramTips: {},
-  },
-};
-
 const flangerStub: EffectDefinition = {
   id: 'flanger',
   displayName: 'Flanger',
@@ -89,56 +43,6 @@ const flangerStub: EffectDefinition = {
     ],
     headrushNotes:
       'Found in the Modulation/FX section. Try the "Through-Zero Flanger" model for the original tape-flanger sound.',
-    paramTips: {},
-  },
-};
-
-const phaserStub: EffectDefinition = {
-  id: 'phaser',
-  displayName: 'Phaser',
-  category: 'mod',
-  shortDescription:
-    'All-pass filter chain that creates moving notches without delay — swirly, watery effect.',
-  implemented: false,
-  params: [],
-  lesson: {
-    tldr: 'Phaser uses a chain of all-pass filters whose phase response is swept by an LFO, creating moving notches when summed with the dry signal.',
-    whatItDoes:
-      'Unlike a flanger, a phaser doesn\'t use delay. It uses 2/4/6/8 all-pass filters in series, each shifting phase but not amplitude. Mixing the phase-shifted output with the dry creates comb-like notches at frequencies determined by the filter design. Modulating the all-pass cutoffs sweeps those notches.',
-    physics:
-      'An all-pass filter has flat magnitude but frequency-dependent phase shift. Cascading 4 of them creates 2 notches in the summed output (one per pair). Phase shift at the notch is exactly 180° so they cancel against the dry copy.',
-    signalImpact: [
-      'Moving notches in the spectrum (fewer, less aggressive than a flanger)',
-      'No delay = no comb stack — sounds smoother',
-      'Subtle; perfect for clean rhythm guitar',
-    ],
-    headrushNotes:
-      'Modulation block — try the MXR Phase 90 / 100 models. Single knob (Rate) on the originals; Prime gives you Depth, Stages, Mix too.',
-    paramTips: {},
-  },
-};
-
-const tremoloStub: EffectDefinition = {
-  id: 'tremolo',
-  displayName: 'Tremolo',
-  category: 'mod',
-  shortDescription:
-    'Cyclic volume modulation via LFO — "helicopter" amplitude wobble.',
-  implemented: false,
-  params: [],
-  lesson: {
-    tldr: 'Tremolo modulates the volume in a cycle. Don\'t confuse with vibrato (pitch modulation) — Fender mislabeled them in the 60s and the misnomer stuck.',
-    whatItDoes:
-      'A VCA (voltage-controlled amplifier) whose gain is swept by a low-frequency oscillator. Sine wave LFO = smooth swell; square wave = on/off chop; harmonic tremolo splits the signal across two filters and alternates between them.',
-    physics:
-      'Pure amplitude modulation. If LFO is at f_m and signal at f_s, AM creates sidebands at f_s ± f_m — but they\'re weak compared to delay-based effects.',
-    signalImpact: [
-      'Periodic volume changes',
-      'Doesn\'t change pitch (that\'s vibrato)',
-      'Square-wave tremolo = "stutter" effect',
-    ],
-    headrushNotes:
-      'Modulation block. Look for "Bias Tremolo" (vintage Fender, smooth) and "Harmonic Tremolo" (classic brown Fender, treble/bass alternation).',
     paramTips: {},
   },
 };
@@ -169,9 +73,9 @@ const pitchStub: EffectDefinition = {
 };
 
 const allDefs: EffectDefinition[] = [
-  noiseGateStub,
+  noiseGateDef,
   compressorDef,
-  wahStub,
+  wahDef,
   pitchStub,
   distortionDef,
   fenderCleanDef,
@@ -182,8 +86,8 @@ const allDefs: EffectDefinition[] = [
   cabDef,
   chorusDef,
   flangerStub,
-  phaserStub,
-  tremoloStub,
+  phaserDef,
+  tremoloDef,
   delayDef,
   reverbDef,
 ];

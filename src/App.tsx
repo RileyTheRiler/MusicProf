@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { engine } from './audio/engine';
 import { effectDefinitions } from './audio/effects';
 import { ChordPicker } from './components/ChordPicker';
+import { Classroom } from './components/Classroom';
 import { EffectPalette } from './components/EffectPalette';
 import { LessonPanel } from './components/LessonPanel';
 import { PresetBar } from './components/PresetBar';
 import { SignalChain } from './components/SignalChain';
 import { Visualizer } from './components/Visualizer';
 import type { Preset } from './data/presets';
+import type { LessonDemo } from './lessons/types';
 import type { ChainBlock, EffectDefinition } from './types';
 
 let blockSeq = 0;
@@ -62,7 +64,10 @@ const blockFromPreset = (
   return { id: newBlockId(), defId, bypass, paramValues: merged };
 };
 
+type Tab = 'lab' | 'classroom';
+
 export default function App() {
+  const [tab, setTab] = useState<Tab>('lab');
   const [started, setStarted] = useState(false);
   const [chain, setChain] = useState<ChainBlock[]>(defaultChain);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -134,6 +139,33 @@ export default function App() {
     setSelectedId(null);
   };
 
+  const handleTryDemo = async (demo: LessonDemo) => {
+    // 1) Ensure audio is started (auto-prompt user gesture is satisfied by
+    //    the button click that called this handler).
+    if (!started) {
+      await engine.start();
+      setStarted(true);
+      engine.setMasterVolume(masterDb);
+    }
+    // 2) If the demo specifies a chain, load it; otherwise keep the current one.
+    if (demo.chain) {
+      const next = demo.chain.map((b) =>
+        blockFromPreset(b.defId, b.bypass, b.paramValues)
+      );
+      updateChain(next);
+      setSelectedId(null);
+    }
+    // 3) Switch to the Lab so the user can SEE the visualizer and chain.
+    setTab('lab');
+    // 4) Auto-play after a brief delay to let the engine settle on the new chain.
+    if (demo.play) {
+      setTimeout(() => {
+        if (demo.play!.kind === 'note') engine.playNote(demo.play!.note);
+        else engine.playChord(demo.play!.notes);
+      }, 250);
+    }
+  };
+
   const selectedBlock = chain.find((b) => b.id === selectedId) ?? null;
   const selectedDef = selectedBlock
     ? effectDefinitions[selectedBlock.defId] ?? null
@@ -142,17 +174,31 @@ export default function App() {
   return (
     <div className="min-h-screen bg-bg-950 text-zinc-200">
       <header className="border-b border-bg-700 bg-bg-900 sticky top-0 z-10">
-        <div className="max-w-[1600px] mx-auto px-4 py-3 flex items-center justify-between">
-          <div>
-            <h1 className="text-lg font-medium tracking-tight">
-              MusicProf{' '}
-              <span className="text-zinc-500 text-sm font-normal">
-                · Guitar Signal Chain Lab
-              </span>
-            </h1>
-            <p className="text-[11px] text-zinc-500">
-              Modeled after the Headrush Prime · v0
-            </p>
+        <div className="max-w-[1600px] mx-auto px-4 py-3 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-6">
+            <div>
+              <h1 className="text-lg font-medium tracking-tight">
+                MusicProf{' '}
+                <span className="text-zinc-500 text-sm font-normal">
+                  · Guitar Signal Chain Lab
+                </span>
+              </h1>
+              <p className="text-[11px] text-zinc-500">
+                Modeled after the Headrush Prime
+              </p>
+            </div>
+            <nav className="flex gap-1 bg-bg-800 border border-bg-600 rounded p-0.5">
+              <TabButton
+                active={tab === 'lab'}
+                onClick={() => setTab('lab')}
+                label="Lab"
+              />
+              <TabButton
+                active={tab === 'classroom'}
+                onClick={() => setTab('classroom')}
+                label="Classroom"
+              />
+            </nav>
           </div>
           <div className="flex items-center gap-3">
             <label className="flex items-center gap-2 text-xs text-zinc-400">
@@ -186,47 +232,53 @@ export default function App() {
         </div>
       </header>
 
-      <main className="max-w-[1600px] mx-auto p-4 grid grid-cols-12 gap-4">
-        <div className="col-span-12 lg:col-span-8 space-y-4">
-          <PresetBar onLoad={handleLoadPreset} />
+      <main className="max-w-[1600px] mx-auto p-4">
+        {tab === 'lab' ? (
+          <div className="grid grid-cols-12 gap-4">
+            <div className="col-span-12 lg:col-span-8 space-y-4">
+              <PresetBar onLoad={handleLoadPreset} />
 
-          <SignalChain
-            chain={chain}
-            selectedId={selectedId}
-            onSelect={setSelectedId}
-            onBypass={handleBypass}
-            onParam={handleParam}
-            onRemove={handleRemove}
-            onReorder={updateChain}
-          />
+              <SignalChain
+                chain={chain}
+                selectedId={selectedId}
+                onSelect={setSelectedId}
+                onBypass={handleBypass}
+                onParam={handleParam}
+                onRemove={handleRemove}
+                onReorder={updateChain}
+              />
 
-          <Visualizer running={started} />
+              <Visualizer running={started} />
 
-          <div className="bg-bg-900 border border-bg-700 rounded p-4">
-            <h2 className="text-sm uppercase tracking-wider text-zinc-400 mb-3">
-              Play something
-            </h2>
-            <ChordPicker
-              onPlayNote={(n) => engine.playNote(n)}
-              onPlayChord={(notes) => engine.playChord(notes)}
-              disabled={!started}
-            />
-            {!started && (
-              <p className="mt-3 text-xs text-zinc-500">
-                Click <strong>Power on</strong> in the top right to enable
-                audio.
-              </p>
-            )}
+              <div className="bg-bg-900 border border-bg-700 rounded p-4">
+                <h2 className="text-sm uppercase tracking-wider text-zinc-400 mb-3">
+                  Play something
+                </h2>
+                <ChordPicker
+                  onPlayNote={(n) => engine.playNote(n)}
+                  onPlayChord={(notes) => engine.playChord(notes)}
+                  disabled={!started}
+                />
+                {!started && (
+                  <p className="mt-3 text-xs text-zinc-500">
+                    Click <strong>Power on</strong> in the top right to enable
+                    audio.
+                  </p>
+                )}
+              </div>
+
+              <EffectPalette onAdd={handleAdd} />
+            </div>
+
+            <div className="col-span-12 lg:col-span-4">
+              <div className="lg:sticky lg:top-20">
+                <LessonPanel block={selectedBlock} def={selectedDef} />
+              </div>
+            </div>
           </div>
-
-          <EffectPalette onAdd={handleAdd} />
-        </div>
-
-        <div className="col-span-12 lg:col-span-4">
-          <div className="lg:sticky lg:top-20">
-            <LessonPanel block={selectedBlock} def={selectedDef} />
-          </div>
-        </div>
+        ) : (
+          <Classroom onTryDemo={handleTryDemo} />
+        )}
       </main>
 
       <footer className="max-w-[1600px] mx-auto p-4 text-[11px] text-zinc-600 leading-relaxed">
@@ -239,5 +291,28 @@ export default function App() {
         </p>
       </footer>
     </div>
+  );
+}
+
+function TabButton({
+  label,
+  active,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`px-4 py-1 rounded text-sm transition-colors ${
+        active
+          ? 'bg-bg-700 text-zinc-100'
+          : 'text-zinc-400 hover:text-zinc-200'
+      }`}
+    >
+      {label}
+    </button>
   );
 }
