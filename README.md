@@ -22,22 +22,24 @@ Switch between them with the tabs in the header.
 
 ### Lab — interactive signal chain editor
 
-- **Audio engine** built on Tone.js + the Web Audio API. Source is an 8-voice
-  Karplus-Strong plucked-string synth.
-- **Working effect blocks (real DSP):**
+- **Audio engine** built on Tone.js + the Web Audio API.
+- **Source:** synthesized 8-voice Karplus-Strong plucked-string by default,
+  or your **real guitar via an audio interface** — switch in the "Input source"
+  panel. Plug in a 1/4" cable, grant mic permission, pick your device, set the
+  input gain, and play through the same chain.
+- **Working effect blocks (real DSP) — full catalog implemented:**
   - Noise Gate, Studio Compressor
   - Wah (manual + auto-sweep)
+  - Pitch Shifter / Octaver
   - Overdrive (Tube-Screamer style)
   - **Amp models:** Fender Clean (Twin), Marshall Crunch (Plexi/JCM),
     Mesa Hi-Gain (Mark/Recto), Vox Chime (AC30) — each with its own
     multi-stage waveshaper curves and tone-stack voicing
   - 3-Band EQ
   - Cabinet (4×12 filter approximation)
-  - Chorus, Phaser, Tremolo
+  - Chorus, Flanger, Phaser, Tremolo
   - Analog Delay (with feedback filter)
   - Hall Reverb
-- **Catalog-only blocks (lessons present, audio coming soon):** Flanger,
-  Pitch Shifter.
 - **Tone presets:** one-click load complete chains modeling real-world tones
   — Pristine Clean, Blues Crunch, Classic Rock Lead, Modern Metal,
   Ambient Lead, Funk Clean.
@@ -56,6 +58,9 @@ auto-play a relevant chord or note. Current chapters:
   What's a Signal Chain · Why Order Matters · Gain Staging
 - **Effects & Tone-Building** (3 lessons): Time-Based Effects · The
   Modulation Family · Building a Tone From Scratch
+- **Going Live** (1 lesson): Plug In Your Real Guitar — full audio-interface
+  walkthrough and the workflow for transferring a tone you designed here to
+  your physical Headrush.
 
 ## Project layout
 
@@ -111,9 +116,9 @@ src/
 ## Roadmap
 
 - Convolution-based cabinet IRs (real Greenback / V30 recordings)
-- Flanger and Pitch Shifter audio
-- Live guitar input via Web Audio (plug an audio interface into the browser)
 - More lessons: pickups deep dive, recording / mixing context, music theory
   basics for the guitarist
 - Tap-tempo + tempo-synced delay
 - User-saved presets (localStorage)
+- Tuner block
+- MIDI in for foot-switch / expression-pedal control

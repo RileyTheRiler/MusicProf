@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { engine } from './audio/engine';
+import type { SourceKind } from './audio/engine';
 import { effectDefinitions } from './audio/effects';
 import { ChordPicker } from './components/ChordPicker';
 import { Classroom } from './components/Classroom';
@@ -7,6 +8,7 @@ import { EffectPalette } from './components/EffectPalette';
 import { LessonPanel } from './components/LessonPanel';
 import { PresetBar } from './components/PresetBar';
 import { SignalChain } from './components/SignalChain';
+import { SourceSelector } from './components/SourceSelector';
 import { Visualizer } from './components/Visualizer';
 import type { Preset } from './data/presets';
 import type { LessonDemo } from './lessons/types';
@@ -72,6 +74,8 @@ export default function App() {
   const [chain, setChain] = useState<ChainBlock[]>(defaultChain);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [masterDb, setMasterDb] = useState(-6);
+  const [source, setSource] = useState<SourceKind>('synth');
+  const [inputDb, setInputDb] = useState(0);
 
   useEffect(() => {
     engine.setChain(chain);
@@ -129,6 +133,17 @@ export default function App() {
   const handleMasterVol = (db: number) => {
     setMasterDb(db);
     engine.setMasterVolume(db);
+  };
+
+  const handleInputDb = (db: number) => {
+    setInputDb(db);
+    engine.setInputGainDb(db);
+  };
+
+  const handleSourceChange = () => {
+    // Pull updated state from engine (which is the source of truth for
+    // whether mic permission was granted etc.)
+    setSource(engine.getSource());
   };
 
   const handleLoadPreset = (preset: Preset) => {
@@ -236,6 +251,13 @@ export default function App() {
         {tab === 'lab' ? (
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12 lg:col-span-8 space-y-4">
+              <SourceSelector
+                source={source}
+                onSourceChange={handleSourceChange}
+                inputDb={inputDb}
+                onInputDbChange={handleInputDb}
+              />
+
               <PresetBar onLoad={handleLoadPreset} />
 
               <SignalChain
@@ -257,14 +279,19 @@ export default function App() {
                 <ChordPicker
                   onPlayNote={(n) => engine.playNote(n)}
                   onPlayChord={(notes) => engine.playChord(notes)}
-                  disabled={!started}
+                  disabled={!started || source === 'live'}
                 />
-                {!started && (
+                {!started ? (
                   <p className="mt-3 text-xs text-zinc-500">
                     Click <strong>Power on</strong> in the top right to enable
                     audio.
                   </p>
-                )}
+                ) : source === 'live' ? (
+                  <p className="mt-3 text-xs text-zinc-500">
+                    Synth playback is disabled while Live Guitar is the source.
+                    Just play your real guitar.
+                  </p>
+                ) : null}
               </div>
 
               <EffectPalette onAdd={handleAdd} />

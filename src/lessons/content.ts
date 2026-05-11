@@ -805,7 +805,83 @@ const buildingBlocks: Chapter = {
   lessons: [lessonTimeEffects, lessonModulation, lessonBuildingTone],
 };
 
-export const CURRICULUM: Chapter[] = [foundations, buildingBlocks];
+// ----------------------------------------------------------------------------
+// Chapter 3 — Going Live
+// ----------------------------------------------------------------------------
+
+const lessonLiveInput: Lesson = {
+  id: 'live-input',
+  title: 'Plug In Your Real Guitar',
+  subtitle:
+    'How to route your physical guitar through MusicProf via an audio interface.',
+  estMinutes: 5,
+  body: [
+    {
+      kind: 'p',
+      text: 'Everything you\'ve built in the Lab so far has been running on a *synthesized* guitar source — a Karplus-Strong plucked-string model. It captures the shape of a plucked string but doesn\'t sound exactly like your guitar. You can run your **real** guitar through these same effects.',
+    },
+    { kind: 'h2', text: 'What you need' },
+    {
+      kind: 'list',
+      ordered: true,
+      items: [
+        'An **audio interface** — a small box that turns your guitar\'s 1/4" output into a signal your computer can understand. Examples: Focusrite Scarlett Solo, PreSonus AudioBox, Apogee Jam, even certain mixer-USB combos. Around $50–150 buys a good one.',
+        'A **1/4" guitar cable** plugged from your guitar into the interface\'s "Instrument" or "Hi-Z" input. (This is important — the interface\'s "line" or "mic" input has the wrong impedance and will sound thin.)',
+        '**Headphones**, plugged into the interface OR into your computer. **DO NOT use speakers** while live monitoring — your microphone (or a feedback loop through the interface) will create a howl.',
+        'A modern **browser** that supports the Web Audio API and getUserMedia (Chrome, Firefox, Safari, Edge — all current versions work).',
+      ],
+    },
+    { kind: 'h2', text: 'Walkthrough' },
+    {
+      kind: 'list',
+      ordered: true,
+      items: [
+        'In the Lab, find the **Input source** panel at the top of the chain editor.',
+        'Click **Live guitar**. Your browser will ask for microphone permission — grant it. (Modern browsers consider audio interfaces "microphones" too.)',
+        'After permission is granted, a dropdown appears with all available input devices. Pick your audio interface from the list.',
+        'Watch the **DRY waveform** on the visualizer. Strum your guitar. If the waveform is flat, increase the Input gain slider until peaks hit roughly ±0.3 to ±0.5. If the waveform clips (peaks at ±1 and flatten), reduce the input gain on your *interface* (the physical knob) before reducing in software.',
+        'Now play through the chain. The effects you tweak in the Lab apply to your real guitar in real time.',
+      ],
+    },
+    { kind: 'h2', text: 'About latency' },
+    {
+      kind: 'p',
+      text: 'There will be a small delay between when you pick a note and when you hear it back through the chain. Web Audio + decent interface = ~10–20 ms typically. That\'s noticeable but not unplayable. If it bothers you:',
+    },
+    {
+      kind: 'list',
+      items: [
+        'Use your audio interface\'s **direct monitoring** feature (a knob/button on the interface that routes input to output without going through software). You\'ll hear yourself dry, instantly, but you also won\'t hear the effects on yourself in real time — only the recording.',
+        'On a real performance rig you\'d use the **physical Headrush Prime**, which has sub-3 ms latency. This simulator is for learning, not gigging.',
+      ],
+    },
+    {
+      kind: 'callout',
+      flavor: 'warn',
+      title: 'Feedback safety',
+      text: 'If you connect a microphone (not an instrument input) and use speakers, you WILL get howling feedback. Use headphones. If you ever hear a sudden loud building tone, mute the master volume immediately.',
+    },
+    { kind: 'h2', text: 'Mapping to your physical Headrush Prime' },
+    {
+      kind: 'p',
+      text: 'Once you\'ve found a tone you like in MusicProf, write down the block list and parameter values. Now sit at your physical Prime and recreate the same chain there. The block names map directly (we call ours "Marshall Crunch" — on the Prime it might be "Plexi 50" or "JCM800"; pick whichever model on the Prime sounds closest, then tweak its Gain/Bass/Mid/Treble to match what you set here). Once dialed in, save it as a rig on the Prime.',
+    },
+    {
+      kind: 'p',
+      text: 'This workflow — design tones cheaply on screen, then transfer to the hardware — is exactly how studio engineers and touring guitarists use modeling rigs.',
+    },
+  ],
+};
+
+const goingLive: Chapter = {
+  id: 'going-live',
+  title: 'Going Live',
+  description:
+    'How to plug your real guitar in and translate everything you\'ve learned to your physical Headrush.',
+  lessons: [lessonLiveInput],
+};
+
+export const CURRICULUM: Chapter[] = [foundations, buildingBlocks, goingLive];
 
 export function findLesson(id: string): Lesson | null {
   for (const ch of CURRICULUM) {
