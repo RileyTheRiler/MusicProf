@@ -258,7 +258,14 @@ export default function App() {
                 onInputDbChange={handleInputDb}
               />
 
-              <PresetBar onLoad={handleLoadPreset} />
+              <PresetBar
+                onLoad={handleLoadPreset}
+                currentChain={chain.map((b) => ({
+                  defId: b.defId,
+                  bypass: b.bypass,
+                  paramValues: { ...b.paramValues },
+                }))}
+              />
 
               <SignalChain
                 chain={chain}

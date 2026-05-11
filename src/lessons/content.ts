@@ -797,12 +797,173 @@ const foundations: Chapter = {
   ],
 };
 
+const lessonCabsAndIRs: Lesson = {
+  id: 'cabs-and-irs',
+  title: 'Cabs and Impulse Responses',
+  subtitle:
+    'Why a guitar cab is more than "a speaker", and what convolution actually does to your signal.',
+  estMinutes: 7,
+  body: [
+    {
+      kind: 'p',
+      text: 'When you hear "Marshall sound", "Vox sound", "Mesa sound" — half of what you\'re hearing is the AMP. The other half is the **cabinet** (and the **microphone** in front of it). Together, the cab + mic act as a complicated, frequency-dependent filter on top of the amp\'s signal. Get the cab wrong and even a beautiful amp tone collapses.',
+    },
+    { kind: 'h2', text: 'Why a cab matters so much' },
+    {
+      kind: 'list',
+      items: [
+        'A guitar speaker is a mechanical low-pass + resonator. The paper cone has mass and stiffness. It can\'t move fast enough to reproduce frequencies above ~5–6 kHz; it can\'t move enough air to reproduce below ~80 Hz. Inside that band, the cone has resonant modes that emphasize certain frequencies — the cab\'s "voice".',
+        'The cabinet box itself adds resonances at low frequencies (50–150 Hz), like an instrument body.',
+        'The microphone picks up some of the room around the cab too — early reflections off the back of the cab, the wall behind it, etc.',
+        'Different speakers (Greenback, Vintage 30, Blue Alnico, Tweed Jensen) have measurably different resonant profiles. Different cabinets (open-back 1×12 vs closed-back 4×12) sound dramatically different even with the same speakers.',
+      ],
+    },
+    { kind: 'h2', text: 'How modeling rigs reproduce this' },
+    {
+      kind: 'p',
+      text: 'Without a cab, a raw distorted amp signal is full of energy above 5 kHz — buzzy, harsh, "digital-sounding". To replicate the natural smoothing of a real cab, modeling rigs use a math operation called **convolution** with an **impulse response** (IR).',
+    },
+    { kind: 'h2', text: 'What is an impulse response?' },
+    {
+      kind: 'p',
+      text: 'An IR is the *output* of a system when you feed it a single-sample "click" (a Dirac impulse). For a cab + mic, the IR is what the mic captures after that click hits the speaker — a short ~100 ms recording that contains the cab\'s entire frequency response, resonances, and reflections. Once you have the IR, you can mathematically apply it to any signal:',
+    },
+    {
+      kind: 'callout',
+      flavor: 'info',
+      title: 'Convolution in one line',
+      text: 'output[n] = sum over k of input[k] × IR[n − k]. In words: every sample of input becomes a scaled, time-shifted copy of the entire IR, all summed together at the output. Linear, signal-preserving, fully captures the cab\'s tone.',
+    },
+    {
+      kind: 'p',
+      text: 'For a 100 ms IR at 44,100 samples/sec, that\'s about 4,400 multiplications PER OUTPUT SAMPLE — so 200 million multiplications per second. Web Audio handles this efficiently via FFT-based convolution.',
+    },
+    { kind: 'h2', text: 'Why IR cabs sound better than filter approximations' },
+    {
+      kind: 'p',
+      text: 'My first cab implementation used three filters: a high-pass, a single resonant peak, and a low-pass. That captures the BROAD shape of a guitar cab\'s frequency response — and is enough to make a hi-gain amp listenable — but it misses the dozens of subtle resonances a real cone has, the box modes, and the slight pre-echo from the cabinet back wall.',
+    },
+    {
+      kind: 'p',
+      text: 'A real IR captures all of that for free, because it\'s a *recording* of a real cab. In MusicProf the IRs are *synthesized* (we don\'t have real recordings to ship), so they\'re still simplified — but they\'re much closer to a real cab than three filters can ever be.',
+    },
+    { kind: 'h2', text: 'Listening exercise' },
+    {
+      kind: 'p',
+      text: 'The four cab models we ship — Greenback, V30, Tweed, Blue — have distinctly different IRs. Same amp, different cab = wildly different tone. Try these demos:',
+    },
+    {
+      kind: 'demo',
+      demo: {
+        label: 'Same amp, Greenback cab',
+        description:
+          'Marshall amp + Greenback cab. The classic 70s British rock sound. Listen to the warm upper mids around 850 Hz.',
+        chain: [
+          {
+            defId: 'amp-marshall-crunch',
+            bypass: false,
+            paramValues: {
+              gain: 5,
+              bass: -1,
+              mid: 3,
+              treble: 4,
+              presence: 3,
+              sag: 4,
+              volume: 0,
+            },
+          },
+          {
+            defId: 'cab-4x12',
+            bypass: false,
+            paramValues: { lowCut: 90, highCut: 7000, air: 0, mix: 1 },
+          },
+        ],
+        play: { kind: 'chord', notes: ['E2', 'B2', 'E3', 'G3', 'B3', 'E4'] },
+      },
+    },
+    {
+      kind: 'demo',
+      demo: {
+        label: 'Same amp, V30 cab',
+        description:
+          'Same Marshall. Now into a Vintage 30. Notice how the upper-mid resonance moves up to ~2.2 kHz — the tone becomes more "bitey", aggressive, modern. Better suited to hi-gain.',
+        chain: [
+          {
+            defId: 'amp-marshall-crunch',
+            bypass: false,
+            paramValues: {
+              gain: 5,
+              bass: -1,
+              mid: 3,
+              treble: 4,
+              presence: 3,
+              sag: 4,
+              volume: 0,
+            },
+          },
+          {
+            defId: 'cab-v30',
+            bypass: false,
+            paramValues: { lowCut: 100, highCut: 5800, air: 0, mix: 1 },
+          },
+        ],
+        play: { kind: 'chord', notes: ['E2', 'B2', 'E3', 'G3', 'B3', 'E4'] },
+      },
+    },
+    {
+      kind: 'demo',
+      demo: {
+        label: 'Same amp, Blue Alnico cab',
+        description:
+          'Now into a Vox-style Blue. Suddenly the same Marshall tone is bright, chimey, jangly — way too treble-heavy for hi-gain. This cab is built for clean amps. The mismatch teaches you that amp and cab are a pair, not independent choices.',
+        chain: [
+          {
+            defId: 'amp-marshall-crunch',
+            bypass: false,
+            paramValues: {
+              gain: 5,
+              bass: -1,
+              mid: 3,
+              treble: 4,
+              presence: 3,
+              sag: 4,
+              volume: 0,
+            },
+          },
+          {
+            defId: 'cab-blue',
+            bypass: false,
+            paramValues: { lowCut: 90, highCut: 8000, air: 0, mix: 1 },
+          },
+        ],
+        play: { kind: 'chord', notes: ['E2', 'B2', 'E3', 'G3', 'B3', 'E4'] },
+      },
+    },
+    {
+      kind: 'callout',
+      flavor: 'tip',
+      title: 'Picking a cab',
+      text: 'Match the cab to the amp\'s natural role. Hi-gain modern amps → V30. Classic Marshall-flavor → Greenback. Vintage/blues American → Tweed. Bright jangly cleans (Vox, AC30) → Blue Alnico. The Headrush Prime offers 40+ IRs and lets you load your own — every speaker/mic/room combo has its own IR.',
+    },
+    { kind: 'h2', text: 'A note on real-world IRs' },
+    {
+      kind: 'p',
+      text: 'Professional IR libraries (Two Notes Genome, ML Sound Lab, OwnHammer, etc.) ship recordings of real cabs with multiple mic types (SM57, MD421, R121 ribbon, etc.) at multiple positions (cap, edge, off-axis, room). Each combination is a different IR. A modern recording engineer rarely "mics a real cab" anymore — they record the amp\'s direct out, then load the IR after the fact, choosing among dozens of mic/cab combinations. This is why everyone\'s records sound polished now: you can iterate the cab choice without re-tracking the guitar.',
+    },
+  ],
+};
+
 const buildingBlocks: Chapter = {
   id: 'building-blocks',
   title: 'Effects & Tone-Building',
   description:
     'A closer look at the time-based and modulation effect families, plus a workflow for building tones.',
-  lessons: [lessonTimeEffects, lessonModulation, lessonBuildingTone],
+  lessons: [
+    lessonTimeEffects,
+    lessonModulation,
+    lessonCabsAndIRs,
+    lessonBuildingTone,
+  ],
 };
 
 // ----------------------------------------------------------------------------

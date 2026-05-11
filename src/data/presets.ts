@@ -195,14 +195,9 @@ export const PRESETS: Preset[] = [
         paramValues: { low: -2, midGain: -2, midFreq: 500, high: 1 },
       },
       {
-        defId: 'cab-4x12',
+        defId: 'cab-v30',
         bypass: false,
-        paramValues: {
-          lowCut: 110,
-          highCut: 4800,
-          resonance: 4,
-          character: 2500,
-        },
+        paramValues: { lowCut: 110, highCut: 4800, air: -1, mix: 1 },
       },
       {
         defId: 'reverb-hall',
@@ -243,14 +238,9 @@ export const PRESETS: Preset[] = [
         },
       },
       {
-        defId: 'cab-4x12',
+        defId: 'cab-blue',
         bypass: false,
-        paramValues: {
-          lowCut: 80,
-          highCut: 6000,
-          resonance: 5,
-          character: 2700,
-        },
+        paramValues: { lowCut: 90, highCut: 8000, air: 2, mix: 1 },
       },
       {
         defId: 'mod-chorus',

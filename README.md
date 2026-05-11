@@ -36,13 +36,15 @@ Switch between them with the tabs in the header.
     Mesa Hi-Gain (Mark/Recto), Vox Chime (AC30) — each with its own
     multi-stage waveshaper curves and tone-stack voicing
   - 3-Band EQ
-  - Cabinet (4×12 filter approximation)
+  - **Cabinet (convolution-based):** 4 cab models — Greenback 4×12, Vintage 30
+    4×12, Tweed 1×12, Blue Alnico 2×12 — each running Tone.Convolver over a
+    synthesized impulse response that captures the speaker's resonant modes
   - Chorus, Flanger, Phaser, Tremolo
   - Analog Delay (with feedback filter)
   - Hall Reverb
-- **Tone presets:** one-click load complete chains modeling real-world tones
-  — Pristine Clean, Blues Crunch, Classic Rock Lead, Modern Metal,
-  Ambient Lead, Funk Clean.
+- **Tone presets:** built-in (Pristine Clean, Blues Crunch, Classic Rock Lead,
+  Modern Metal, Ambient Lead, Funk Clean) PLUS save your own — current chain
+  saves to localStorage, survives reloads, click to recall.
 - **Chain editor:** add, remove, reorder, and bypass blocks.
 - **Visualizer:** dry vs. wet waveform + log-frequency spectrum, side-by-side.
 - **Lesson panel:** TL;DR + what-it-does + physics + signal impact + Headrush
@@ -56,8 +58,8 @@ auto-play a relevant chord or note. Current chapters:
 
 - **Foundations** (5 lessons): How Sound Works · The Electric Guitar Signal ·
   What's a Signal Chain · Why Order Matters · Gain Staging
-- **Effects & Tone-Building** (3 lessons): Time-Based Effects · The
-  Modulation Family · Building a Tone From Scratch
+- **Effects & Tone-Building** (4 lessons): Time-Based Effects · The
+  Modulation Family · Cabs and Impulse Responses · Building a Tone From Scratch
 - **Going Live** (1 lesson): Plug In Your Real Guitar — full audio-interface
   walkthrough and the workflow for transferring a tone you designed here to
   your physical Headrush.
@@ -115,10 +117,11 @@ src/
 
 ## Roadmap
 
-- Convolution-based cabinet IRs (real Greenback / V30 recordings)
+- Convolution-based cabinet IRs using **real** recordings (currently
+  synthesized; ship a couple of CC-0 IRs for ultimate authenticity)
 - More lessons: pickups deep dive, recording / mixing context, music theory
   basics for the guitarist
 - Tap-tempo + tempo-synced delay
-- User-saved presets (localStorage)
-- Tuner block
+- Tuner block (useful with live input)
 - MIDI in for foot-switch / expression-pedal control
+- Import/export user presets (JSON, share with friends)

@@ -8,7 +8,12 @@ import {
 import { compressorDef } from './compressor';
 import { distortionDef } from './distortion';
 import { eqDef } from './eq';
-import { cabDef } from './cab';
+import {
+  cabBlueDef,
+  cabGreenbackDef,
+  cabTweedDef,
+  cabV30Def,
+} from './cab';
 import { chorusDef } from './chorus';
 import { delayDef } from './delay';
 import { flangerDef } from './flanger';
@@ -30,7 +35,10 @@ const allDefs: EffectDefinition[] = [
   mesaHiGainDef,
   voxChimeDef,
   eqDef,
-  cabDef,
+  cabGreenbackDef,
+  cabV30Def,
+  cabTweedDef,
+  cabBlueDef,
   chorusDef,
   flangerDef,
   phaserDef,
