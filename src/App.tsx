@@ -115,6 +115,9 @@ export default function App() {
     await engine.start();
     engine.setChain(chain);
     engine.setMasterVolume(masterDb);
+    // Push input gain that may have been adjusted before start (slider works
+    // even when audio isn't running).
+    engine.setInputGainDb(inputDb);
     setStarted(true);
   };
 

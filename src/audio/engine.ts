@@ -52,6 +52,12 @@ class AudioEngine {
 
   private listeners = new Set<() => void>();
 
+  /** Returns the AudioContext sample rate (e.g. 44100 or 48000). 0 if not started. */
+  getSampleRate(): number {
+    if (!this.started) return 44100;
+    return Tone.getContext().sampleRate;
+  }
+
   /** Browser audio context state — useful for showing "click to start". */
   isStarted() {
     return this.started;
@@ -146,6 +152,7 @@ class AudioEngine {
       // Permission denied or no device — revert to synth source.
       this.liveInput.dispose();
       this.liveInput = null;
+      this.liveDeviceId = null;
       this.voice.output.connect(this.pickup.input);
       this.source = 'synth';
       this.notify();

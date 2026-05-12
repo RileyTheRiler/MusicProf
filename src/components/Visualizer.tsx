@@ -263,7 +263,7 @@ function drawSpectrum(
   ctx.rect(x0, y0, w, h);
   ctx.clip();
 
-  const sampleRate = 44100;
+  const sampleRate = engine.getSampleRate();
   const nyquist = sampleRate / 2;
   const fmin = 40;
   const fmax = 16000;

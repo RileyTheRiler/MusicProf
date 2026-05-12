@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 export interface KnobProps {
   label: string;
@@ -29,7 +29,6 @@ export function Knob({
   size = 56,
   description,
 }: KnobProps) {
-  const [hover, setHover] = useState(false);
   const drag = useRef<{
     startY: number;
     startVal: number;
@@ -111,8 +110,6 @@ export function Knob({
   return (
     <div
       className="flex flex-col items-center gap-1 select-none"
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
       title={description}
     >
       <div
@@ -165,11 +162,6 @@ export function Knob({
         {display}
         {unit ? <span className="text-zinc-500 ml-0.5">{unit}</span> : null}
       </div>
-      {hover && description ? (
-        <div className="absolute z-50 mt-20 max-w-xs bg-bg-800 text-zinc-200 text-xs p-2 rounded border border-bg-600 shadow-lg pointer-events-none">
-          {description}
-        </div>
-      ) : null}
     </div>
   );
 }

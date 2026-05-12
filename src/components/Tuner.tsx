@@ -7,7 +7,6 @@ import {
   type PitchReading,
 } from '../audio/pitch';
 
-const SAMPLE_RATE_GUESS = 44100; // Tone uses the AudioContext SR; close enough for pitch detection.
 const UPDATE_INTERVAL_MS = 100; // 10 Hz pitch updates — saves CPU.
 const STABLE_FRAMES_REQUIRED = 2; // Need 2 consecutive close readings to commit.
 
@@ -30,7 +29,7 @@ export function Tuner({ running }: Props) {
     const tick = () => {
       const wave = engine.getPreWaveform();
       if (!wave) return;
-      const freq = detectPitch(wave, SAMPLE_RATE_GUESS);
+      const freq = detectPitch(wave, engine.getSampleRate());
       const r = freqToReading(freq);
       if (!r) {
         // No pitch — decay to silence display

@@ -41,11 +41,15 @@ export function detectPitch(buf: Float32Array, sampleRate: number): number {
   const trimmed = buf.subarray(r1, r2);
   const N = trimmed.length;
 
-  // 3) Autocorrelation. Computes c[i] = sum_{j} trimmed[j] * trimmed[j+i].
-  //    O(N²) — at N=900 that's ~800k multiplies. We run this throttled, not
-  //    every frame, so it's fine.
-  const c = new Float32Array(N);
-  for (let i = 0; i < N; i++) {
+  // 3) Autocorrelation, but only over the lag range that could plausibly be
+  //    a guitar pitch (40 Hz to 2 kHz fundamental). That bounds the work
+  //    significantly — at 48 kHz we evaluate ~1175 lags instead of all N.
+  //    Inner sum is also bounded to N - i samples.
+  const minPeriod = Math.max(1, Math.floor(sampleRate / 2000));
+  const maxPeriod = Math.min(N - 1, Math.ceil(sampleRate / 40));
+  if (maxPeriod <= minPeriod) return 0;
+  const c = new Float32Array(maxPeriod + 1);
+  for (let i = minPeriod; i <= maxPeriod; i++) {
     let acc = 0;
     const max = N - i;
     for (let j = 0; j < max; j++) {
@@ -54,21 +58,16 @@ export function detectPitch(buf: Float32Array, sampleRate: number): number {
     c[i] = acc;
   }
 
-  // 4) Find the first dip after lag 0, then the peak after that.
-  let d = 0;
-  while (d + 1 < N && c[d] > c[d + 1]) d++;
+  // 4) Find peak in the candidate range.
   let maxVal = -Infinity;
   let maxPos = -1;
-  // Lower bound on period — corresponds to ~1000 Hz at 44.1kHz (T0 = 44 samples).
-  // No guitar note in standard tuning is higher than that anyway.
-  const minPeriod = Math.max(d, Math.floor(sampleRate / 2000));
-  for (let i = minPeriod; i < N; i++) {
+  for (let i = minPeriod; i <= maxPeriod; i++) {
     if (c[i] > maxVal) {
       maxVal = c[i];
       maxPos = i;
     }
   }
-  if (maxPos < 1 || maxPos >= N - 1) return 0;
+  if (maxPos < 1 || maxPos >= maxPeriod) return 0;
 
   // 5) Parabolic interpolation around the peak for fractional-sample
   //    period resolution.
