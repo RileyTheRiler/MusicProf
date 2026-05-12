@@ -64,6 +64,13 @@ Switch between them with the tabs in the header.
 - **A/B slots:** two independent chains (A and B) that you can flip between
   instantly with the tabs or `A`/`B` keyboard shortcuts. Copy A→B, tweak,
   toggle to compare. The only reliable way to evaluate tone changes.
+- **Export / Import:** the **Export / Import…** action on the Preset bar
+  opens a modal with three views: a human-readable **Recipe** to print or
+  open on your phone while sitting at the physical Headrush, raw **JSON**
+  for sharing, and an **Import** tab that accepts pasted JSON or a `.json`
+  file to restore any exported tone.
+- **Persistent settings:** BPM, master volume, input gain, pickup model,
+  show-tuner state, and active tab survive page reloads (localStorage).
 - **Lesson panel:** TL;DR + what-it-does + physics + signal impact + Headrush
   Prime mapping + per-knob tips, all updating with the currently-selected block.
 

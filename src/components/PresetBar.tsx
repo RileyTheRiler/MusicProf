@@ -6,9 +6,10 @@ interface Props {
   onLoad: (preset: Preset) => void;
   /** Current chain converted to PresetBlock[] for "Save current". */
   currentChain: PresetBlock[];
+  onOpenExport: () => void;
 }
 
-export function PresetBar({ onLoad, currentChain }: Props) {
+export function PresetBar({ onLoad, currentChain, onOpenExport }: Props) {
   const [savedList, setSavedList] = useState<UserPreset[]>(userPresets.list());
   const [showSave, setShowSave] = useState(false);
   const [name, setName] = useState('');
@@ -72,14 +73,23 @@ export function PresetBar({ onLoad, currentChain }: Props) {
           <h2 className="text-xs uppercase tracking-wider text-zinc-400">
             Your presets
           </h2>
-          {!showSave ? (
+          <div className="flex items-center gap-3">
             <button
-              onClick={() => setShowSave(true)}
-              className="text-[11px] text-accent-amber hover:brightness-110"
+              onClick={onOpenExport}
+              title="Export the current chain as a JSON file or human-readable recipe for your physical Prime; or import someone else's tone"
+              className="text-[11px] text-zinc-400 hover:text-zinc-200"
             >
-              + Save current chain
+              Export / Import…
             </button>
-          ) : null}
+            {!showSave ? (
+              <button
+                onClick={() => setShowSave(true)}
+                className="text-[11px] text-accent-amber hover:brightness-110"
+              >
+                + Save current chain
+              </button>
+            ) : null}
+          </div>
         </div>
 
         {showSave ? (

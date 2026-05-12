@@ -6,6 +6,7 @@ import type { PickupId } from './audio/pickups';
 import { ChordPicker } from './components/ChordPicker';
 import { Classroom } from './components/Classroom';
 import { EffectPalette } from './components/EffectPalette';
+import { ExportModal } from './components/ExportModal';
 import { LessonPanel } from './components/LessonPanel';
 import { PresetBar } from './components/PresetBar';
 import { SignalChain } from './components/SignalChain';
@@ -14,7 +15,8 @@ import { SourceSelector } from './components/SourceSelector';
 import { TapTempo } from './components/TapTempo';
 import { Tuner } from './components/Tuner';
 import { Visualizer } from './components/Visualizer';
-import type { Preset } from './data/presets';
+import type { Preset, PresetBlock } from './data/presets';
+import { loadSettings, saveSettings, type PersistedSettings } from './data/settings';
 import type { LessonDemo } from './lessons/types';
 import type { ChainBlock, EffectDefinition } from './types';
 
@@ -82,8 +84,11 @@ const cloneChain = (chain: ChainBlock[]): ChainBlock[] =>
 type Tab = 'lab' | 'classroom';
 type Slot = 'A' | 'B';
 
+// Load persisted settings once at module init so they're synchronous on mount.
+const INITIAL_SETTINGS: PersistedSettings = loadSettings();
+
 export default function App() {
-  const [tab, setTab] = useState<Tab>('lab');
+  const [tab, setTab] = useState<Tab>(INITIAL_SETTINGS.tab);
   const [started, setStarted] = useState(false);
 
   // A/B slots — two independent chains. Active slot's chain is what feeds the
@@ -93,12 +98,13 @@ export default function App() {
   const [activeSlot, setActiveSlot] = useState<Slot>('A');
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [masterDb, setMasterDb] = useState(-6);
+  const [masterDb, setMasterDb] = useState(INITIAL_SETTINGS.masterDb);
   const [source, setSource] = useState<SourceKind>('synth');
-  const [inputDb, setInputDb] = useState(0);
-  const [pickupId, setPickupId] = useState<PickupId>('strat-bridge');
-  const [showTuner, setShowTuner] = useState(false);
-  const [bpm, setBpm] = useState(120);
+  const [inputDb, setInputDb] = useState(INITIAL_SETTINGS.inputDb);
+  const [pickupId, setPickupId] = useState<PickupId>(INITIAL_SETTINGS.pickupId);
+  const [showTuner, setShowTuner] = useState(INITIAL_SETTINGS.showTuner);
+  const [bpm, setBpm] = useState(INITIAL_SETTINGS.bpm);
+  const [exportOpen, setExportOpen] = useState(false);
 
   const chain = activeSlot === 'A' ? chainA : chainB;
   const setChainForSlot = (slot: Slot, next: ChainBlock[]) => {
@@ -108,8 +114,26 @@ export default function App() {
 
   useEffect(() => {
     engine.setChain(chain);
+    // Push loaded settings into the engine — most apply before audio is
+    // started (pickup/tempo are stored in engine state and used when start()
+    // creates the audio nodes).
+    engine.setPickupModel(INITIAL_SETTINGS.pickupId);
+    engine.setTempo(INITIAL_SETTINGS.bpm);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Persist user settings whenever they change. localStorage is synchronous
+  // but the write is cheap; running on every change is fine.
+  useEffect(() => {
+    saveSettings({
+      bpm,
+      masterDb,
+      inputDb,
+      pickupId,
+      showTuner,
+      tab,
+    });
+  }, [bpm, masterDb, inputDb, pickupId, showTuner, tab]);
 
   const handleStart = async () => {
     await engine.start();
@@ -193,6 +217,19 @@ export default function App() {
     );
     updateChain(next);
     setSelectedId(null);
+  };
+
+  const handleImport = (
+    blocks: PresetBlock[],
+    extras: { pickupId?: PickupId; bpm?: number; name?: string }
+  ) => {
+    const next = blocks.map((b) =>
+      blockFromPreset(b.defId, b.bypass, b.paramValues)
+    );
+    updateChain(next);
+    setSelectedId(null);
+    if (extras.pickupId) handlePickupChange(extras.pickupId);
+    if (typeof extras.bpm === 'number') handleBpmChange(extras.bpm);
   };
 
   const handleSwitchSlot = (slot: Slot) => {
@@ -380,6 +417,7 @@ export default function App() {
                   bypass: b.bypass,
                   paramValues: { ...b.paramValues },
                 }))}
+                onOpenExport={() => setExportOpen(true)}
               />
 
               <SignalChain
@@ -432,6 +470,20 @@ export default function App() {
           <Classroom onTryDemo={handleTryDemo} />
         )}
       </main>
+
+      <ExportModal
+        open={exportOpen}
+        onClose={() => setExportOpen(false)}
+        chain={chain.map((b) => ({
+          defId: b.defId,
+          bypass: b.bypass,
+          paramValues: { ...b.paramValues },
+        }))}
+        chainName={`Slot ${activeSlot}`}
+        pickupId={pickupId}
+        bpm={bpm}
+        onImport={handleImport}
+      />
 
       <footer className="max-w-[1600px] mx-auto p-4 text-[11px] text-zinc-600 leading-relaxed">
         <p>
