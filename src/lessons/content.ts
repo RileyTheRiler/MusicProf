@@ -1490,12 +1490,69 @@ const lessonTuning: Lesson = {
   ],
 };
 
+const lessonLooperPractice: Lesson = {
+  id: 'looper-practice',
+  title: 'Practicing With a Looper',
+  subtitle:
+    'The single biggest skill multiplier for solo guitar practice. Record a backing, solo over it, repeat.',
+  estMinutes: 5,
+  body: [
+    {
+      kind: 'p',
+      text: 'A **looper** captures a slice of what you just played and plays it back continuously. The world\'s simplest practice tool — and arguably the most effective. Click **Show looper** in the Lab to enable it.',
+    },
+    { kind: 'h2', text: 'The basic workflow' },
+    {
+      kind: 'list',
+      ordered: true,
+      items: [
+        'Set a tone you want to practice over (any preset works).',
+        'Click **● Record**. Play 4 or 8 bars of a chord progression — Em → C → G → D works for everything.',
+        'Click **Stop & Play** at the start of the next bar. The loop locks in and starts playing back instantly.',
+        'Now play a solo over your own backing. The loop repeats indefinitely; you can practice phrases as many times as you want.',
+        'Click **Clear** to erase the loop and start over.',
+      ],
+    },
+    {
+      kind: 'callout',
+      flavor: 'tip',
+      title: 'Latency tip',
+      text: 'Hit Stop & Play a tiny bit BEFORE you mean to — there\'s usually 50–100 ms of latency between click and the actual stop point. With a couple of practice loops you\'ll calibrate.',
+    },
+    { kind: 'h2', text: 'What makes it so useful' },
+    {
+      kind: 'list',
+      items: [
+        '**Real harmonic context** — solo over CHORDS, not over silence. You can hear if your notes are clashing or in-key.',
+        '**Infinite repetition** — practice one lick 50 times without losing your place in the form.',
+        '**Tone A/B in context** — change effects or amps while the loop plays. Hear instantly how the same notes sound through different rigs.',
+        '**Composition** — record a part, write a counter-part over it. Layer up complete arrangements.',
+      ],
+    },
+    { kind: 'h2', text: 'How this looper works under the hood' },
+    {
+      kind: 'p',
+      text: 'It taps the **post-chain wet signal** — the fully-processed tone you hear. Samples are captured into a 60-second mono Float32Array buffer. On Stop & Play, playback reads from position 0 and wraps around when it hits the end. The loop is the EXACT audio you played, with all your effects baked in — not the dry guitar.',
+    },
+    {
+      kind: 'p',
+      text: 'A consequence: the loop preserves the tone you recorded it with. Change effects after recording, and the LOOP still sounds like the original tone, while your live playing through the same chain has the new tone. That\'s actually useful — it lets you A/B "rhythm vs lead tone" against the same backing.',
+    },
+    {
+      kind: 'callout',
+      flavor: 'info',
+      title: 'On your Headrush Prime',
+      text: 'The Prime has a much more capable looper — overdub layers, undo/redo, half-speed, reverse. This is a simplified one-layer version for browser practice. Same core skill though: the discipline of looping a few bars and improvising over them is what builds real musical fluency.',
+    },
+  ],
+};
+
 const goingLive: Chapter = {
   id: 'going-live',
   title: 'Going Live',
   description:
     'How to plug your real guitar in and translate everything you\'ve learned to your physical Headrush.',
-  lessons: [lessonLiveInput, lessonTuning],
+  lessons: [lessonLiveInput, lessonTuning, lessonLooperPractice],
 };
 
 export const CURRICULUM: Chapter[] = [foundations, buildingBlocks, goingLive];

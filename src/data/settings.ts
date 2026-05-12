@@ -11,6 +11,7 @@ export interface PersistedSettings {
   inputDb: number;
   pickupId: PickupId;
   showTuner: boolean;
+  showLooper: boolean;
   /** Last active tab — 'lab' or 'classroom'. */
   tab: 'lab' | 'classroom';
 }
@@ -23,6 +24,7 @@ export const DEFAULT_SETTINGS: PersistedSettings = {
   inputDb: 0,
   pickupId: 'strat-bridge',
   showTuner: false,
+  showLooper: false,
   tab: 'lab',
 };
 
@@ -55,6 +57,10 @@ export function loadSettings(): PersistedSettings {
         typeof o.showTuner === 'boolean'
           ? o.showTuner
           : DEFAULT_SETTINGS.showTuner,
+      showLooper:
+        typeof o.showLooper === 'boolean'
+          ? o.showLooper
+          : DEFAULT_SETTINGS.showLooper,
       tab: o.tab === 'classroom' ? 'classroom' : 'lab',
     };
   } catch {

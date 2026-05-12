@@ -8,6 +8,7 @@ import { Classroom } from './components/Classroom';
 import { EffectPalette } from './components/EffectPalette';
 import { ExportModal } from './components/ExportModal';
 import { LessonPanel } from './components/LessonPanel';
+import { Looper } from './components/Looper';
 import { PresetBar } from './components/PresetBar';
 import { SignalChain } from './components/SignalChain';
 import { SlotSwitcher } from './components/SlotSwitcher';
@@ -103,6 +104,7 @@ export default function App() {
   const [inputDb, setInputDb] = useState(INITIAL_SETTINGS.inputDb);
   const [pickupId, setPickupId] = useState<PickupId>(INITIAL_SETTINGS.pickupId);
   const [showTuner, setShowTuner] = useState(INITIAL_SETTINGS.showTuner);
+  const [showLooper, setShowLooper] = useState(INITIAL_SETTINGS.showLooper);
   const [bpm, setBpm] = useState(INITIAL_SETTINGS.bpm);
   const [exportOpen, setExportOpen] = useState(false);
 
@@ -131,9 +133,10 @@ export default function App() {
       inputDb,
       pickupId,
       showTuner,
+      showLooper,
       tab,
     });
-  }, [bpm, masterDb, inputDb, pickupId, showTuner, tab]);
+  }, [bpm, masterDb, inputDb, pickupId, showTuner, showLooper, tab]);
 
   const handleStart = async () => {
     await engine.start();
@@ -386,7 +389,7 @@ export default function App() {
                 onPickupChange={handlePickupChange}
               />
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <button
                   onClick={() => setShowTuner((s) => !s)}
                   className={`text-xs px-3 py-1.5 rounded border transition-colors ${
@@ -397,9 +400,20 @@ export default function App() {
                 >
                   {showTuner ? 'Hide tuner' : 'Show tuner'}
                 </button>
+                <button
+                  onClick={() => setShowLooper((s) => !s)}
+                  className={`text-xs px-3 py-1.5 rounded border transition-colors ${
+                    showLooper
+                      ? 'border-accent-amber text-accent-amber bg-amber-500/10'
+                      : 'border-bg-600 text-zinc-400 hover:text-zinc-200 bg-bg-800'
+                  }`}
+                >
+                  {showLooper ? 'Hide looper' : 'Show looper'}
+                </button>
               </div>
 
               {showTuner ? <Tuner running={started} /> : null}
+              {showLooper ? <Looper running={started} /> : null}
 
               <SlotSwitcher
                 activeSlot={activeSlot}

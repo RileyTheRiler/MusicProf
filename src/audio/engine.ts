@@ -1,6 +1,7 @@
 import * as Tone from 'tone';
 import type { ChainBlock, EffectInstance } from '../types';
 import { effectDefinitions } from './effects';
+import { Looper } from './looper';
 import { PICKUPS, PickupFilter, type PickupId } from './pickups';
 import { GuitarVoice } from './voice';
 
@@ -49,6 +50,7 @@ class AudioEngine {
   private source: SourceKind = 'synth';
   private liveDeviceId: string | null = null;
   private tempo = 120;
+  private looper: Looper | null = null;
 
   private listeners = new Set<() => void>();
 
@@ -121,9 +123,20 @@ class AudioEngine {
     this.postTap.connect(this.master);
     this.master.toDestination();
 
+    // Looper taps postTap (records the FULLY processed wet signal) and feeds
+    // its playback back into master alongside the live chain.
+    this.looper = new Looper();
+    this.looper.init();
+    this.postTap.connect(this.looper.input);
+    this.looper.output.connect(this.master);
+
     this.started = true;
     this.rewire();
     this.notify();
+  }
+
+  getLooper(): Looper | null {
+    return this.looper;
   }
 
   /**

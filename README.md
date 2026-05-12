@@ -57,6 +57,9 @@ Switch between them with the tabs in the header.
 - **Tuner:** toggle on a chromatic tuner with autocorrelation-based pitch
   detection. Note + cents needle, recognizes open-string notes in standard
   tuning, throttled to 10 Hz for low CPU.
+- **Looper:** toggle on a 60-second loop recorder. Captures the post-chain
+  wet signal, plays it back continuously, lets you solo over your own
+  rhythm tracks. Mono Float32 buffer, sample-accurate playback.
 - **Tap Tempo + synced delays:** tap the **Tap** button in the header in time
   with the music to set the global BPM. Click the delay block, flip **Sync**
   to on, and pick a **Subdivision** (1/2, dot 1/4, 1/4, dot 1/8, 1/8, 1/16) —
@@ -86,7 +89,8 @@ auto-play a relevant chord or note. Current chapters:
 - **Effects & Tone-Building** (6 lessons): Time-Based Effects · The
   Modulation Family · Cabs and Impulse Responses · Tempo, BPM, and Synced
   Delays · A/B Compare · Building a Tone From Scratch
-- **Going Live** (2 lessons): Plug In Your Real Guitar · Tuning
+- **Going Live** (3 lessons): Plug In Your Real Guitar · Tuning ·
+  Practicing With a Looper
 
 ## Project layout
 
