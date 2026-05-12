@@ -64,6 +64,9 @@ Switch between them with the tabs in the header.
   with the music to set the global BPM. Click the delay block, flip **Sync**
   to on, and pick a **Subdivision** (1/2, dot 1/4, 1/4, dot 1/8, 1/8, 1/16) —
   the delay time locks to the tempo math.
+- **Metronome:** **Click** button in the header toggles an audible click
+  track at the global BPM. Time-signature selector (3/4 through 7/4),
+  visible beat-indicator dots, accent on beat 1.
 - **A/B slots:** two independent chains (A and B) that you can flip between
   instantly with the tabs or `A`/`B` keyboard shortcuts. Copy A→B, tweak,
   toggle to compare. The only reliable way to evaluate tone changes.
@@ -89,8 +92,8 @@ auto-play a relevant chord or note. Current chapters:
 - **Effects & Tone-Building** (6 lessons): Time-Based Effects · The
   Modulation Family · Cabs and Impulse Responses · Tempo, BPM, and Synced
   Delays · A/B Compare · Building a Tone From Scratch
-- **Going Live** (3 lessons): Plug In Your Real Guitar · Tuning ·
-  Practicing With a Looper
+- **Going Live** (4 lessons): Plug In Your Real Guitar · Tuning ·
+  Rhythm, Timing, and the Click · Practicing With a Looper
 
 ## Project layout
 

@@ -9,6 +9,7 @@ import { EffectPalette } from './components/EffectPalette';
 import { ExportModal } from './components/ExportModal';
 import { LessonPanel } from './components/LessonPanel';
 import { Looper } from './components/Looper';
+import { MetronomeWidget } from './components/MetronomeWidget';
 import { PresetBar } from './components/PresetBar';
 import { SignalChain } from './components/SignalChain';
 import { SlotSwitcher } from './components/SlotSwitcher';
@@ -345,6 +346,7 @@ export default function App() {
           </div>
           <div className="flex items-center gap-3">
             <TapTempo bpm={bpm} onChange={handleBpmChange} />
+            <MetronomeWidget />
             <label className="flex items-center gap-2 text-xs text-zinc-400">
               Master
               <input

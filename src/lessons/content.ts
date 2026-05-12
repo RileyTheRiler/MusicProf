@@ -1547,12 +1547,77 @@ const lessonLooperPractice: Lesson = {
   ],
 };
 
+const lessonRhythmAndClick: Lesson = {
+  id: 'rhythm-and-click',
+  title: 'Rhythm, Timing, and the Click',
+  subtitle:
+    'Why every working musician practices to a metronome — and the easy mistake that makes "playing in time" feel impossible.',
+  estMinutes: 4,
+  body: [
+    {
+      kind: 'p',
+      text: 'You can have great tone, killer technique, and zero stage presence — and if your timing is off, none of it matters. Solid timing is the difference between a "guitarist" and a "musician you want to play with".',
+    },
+    { kind: 'h2', text: 'What "in time" actually means' },
+    {
+      kind: 'p',
+      text: 'When you play with a band or a recording, every note happens at a precise mathematical position relative to the song\'s pulse. Drum hits land on beats. Chord changes line up with bar boundaries. The collective brain of the band has to agree on where the pulse is — and where the *next* pulse will be.',
+    },
+    {
+      kind: 'p',
+      text: 'Practicing alone, you don\'t have a drummer. You have to BE the drummer. That\'s what a metronome (or "click track") does — it gives you a steady, unwavering pulse to align your playing against.',
+    },
+    { kind: 'h2', text: 'Using the click' },
+    {
+      kind: 'list',
+      ordered: true,
+      items: [
+        'In the header, click **Tap** four times in a steady tempo (or just type the BPM).',
+        'Click **Click** to enable the metronome. You\'ll hear a high tick on beat 1 and lower ticks on beats 2, 3, 4.',
+        'Pick a 4/4 vs 3/4 time signature from the dropdown. Most songs are 4/4. Waltzes are 3/4. Some prog/odd-meter songs use 5/4, 7/4, etc.',
+        'Now play. Try to land your pick attacks exactly on the click — not before, not after.',
+      ],
+    },
+    {
+      kind: 'callout',
+      flavor: 'tip',
+      title: 'The big mistake',
+      text: 'Beginners try to PLAY ALONG with the click — pick attack arrives at the same time as the click sound. But you actually want to play *slightly into the click*: pick attack timed so that the click sound happens at the same moment you HEAR your note. Sound takes time to travel from amp to ear; your pick action has to lead by ~5–10 ms. Once you internalize this, the click feels "with" you instead of fighting you.',
+    },
+    { kind: 'h2', text: 'Subdivisions' },
+    {
+      kind: 'p',
+      text: 'A click on every quarter note is just the START of timing practice. The harder skill is feeling subdivisions BETWEEN clicks — eighth notes (twice as fast), sixteenth notes (four times as fast), triplets (three notes per beat). Try this: count "1 e + a, 2 e + a, 3 e + a, 4 e + a" out loud while the click ticks. Each syllable is a sixteenth note.',
+    },
+    {
+      kind: 'p',
+      text: 'Once you can verbalize subdivisions, you can play them. Strum a single chord on every quarter, every eighth, every sixteenth. Notice that as you go faster, your ATTACK accuracy has to be tighter — at sixteenths against a 120 BPM click, each attack window is ~125 ms wide. Land outside that window and the rhythm collapses.',
+    },
+    { kind: 'h2', text: 'Combine with the looper' },
+    {
+      kind: 'p',
+      text: 'Real practice workflow: turn on the metronome, then record a chord progression INTO the looper at the matching tempo. The loop captures whatever you played, including any timing errors. Listen back. Was it locked to the click? If not, clear and re-record. The loop will mercilessly expose timing inconsistencies that your ears miss in the moment.',
+    },
+    {
+      kind: 'callout',
+      flavor: 'tip',
+      title: 'Slow down, build up',
+      text: 'Pick a tempo where you can play a passage perfectly cleanly with the click. That\'s your starting tempo. Increase by 5 BPM only when the slower tempo is 100% reliable. Most "fast players" got fast by being patient — they spent a lot of time at 60 BPM building a foundation that holds up at 200.',
+    },
+  ],
+};
+
 const goingLive: Chapter = {
   id: 'going-live',
   title: 'Going Live',
   description:
     'How to plug your real guitar in and translate everything you\'ve learned to your physical Headrush.',
-  lessons: [lessonLiveInput, lessonTuning, lessonLooperPractice],
+  lessons: [
+    lessonLiveInput,
+    lessonTuning,
+    lessonRhythmAndClick,
+    lessonLooperPractice,
+  ],
 };
 
 export const CURRICULUM: Chapter[] = [foundations, buildingBlocks, goingLive];

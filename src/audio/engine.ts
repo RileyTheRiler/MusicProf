@@ -2,6 +2,7 @@ import * as Tone from 'tone';
 import type { ChainBlock, EffectInstance } from '../types';
 import { effectDefinitions } from './effects';
 import { Looper } from './looper';
+import { Metronome } from './metronome';
 import { PICKUPS, PickupFilter, type PickupId } from './pickups';
 import { GuitarVoice } from './voice';
 
@@ -51,6 +52,7 @@ class AudioEngine {
   private liveDeviceId: string | null = null;
   private tempo = 120;
   private looper: Looper | null = null;
+  private metronome: Metronome | null = null;
 
   private listeners = new Set<() => void>();
 
@@ -130,6 +132,10 @@ class AudioEngine {
     this.postTap.connect(this.looper.input);
     this.looper.output.connect(this.master);
 
+    // Metronome — independent of the chain, plays a click track.
+    this.metronome = new Metronome();
+    this.metronome.setBpm(this.tempo);
+
     this.started = true;
     this.rewire();
     this.notify();
@@ -137,6 +143,9 @@ class AudioEngine {
 
   getLooper(): Looper | null {
     return this.looper;
+  }
+  getMetronome(): Metronome | null {
+    return this.metronome;
   }
 
   /**
@@ -285,6 +294,7 @@ class AudioEngine {
       const inst = this.instances.get(block.id);
       if (inst) inst.setParam('tempo', bpm);
     }
+    if (this.metronome) this.metronome.setBpm(bpm);
     this.notify();
   }
 
