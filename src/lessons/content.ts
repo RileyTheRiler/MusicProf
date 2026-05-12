@@ -952,6 +952,102 @@ const lessonReadingTheSignal: Lesson = {
   ],
 };
 
+const lessonABCompare: Lesson = {
+  id: 'ab-compare',
+  title: 'A/B Compare',
+  subtitle:
+    'How professionals actually evaluate tone changes — and why your ears lie to you without it.',
+  estMinutes: 4,
+  body: [
+    {
+      kind: 'p',
+      text: 'Here\'s a hard truth about ear training: **your hearing has terrible short-term memory**. You can\'t reliably compare a tone you heard 30 seconds ago against the one you\'re hearing right now. The brain rewrites the past constantly. So if you tweak a knob, play, tweak again, play — you\'re not actually evaluating anything, you\'re just accumulating changes and hoping it sounds "better".',
+    },
+    {
+      kind: 'p',
+      text: 'The fix is **A/B testing** — keeping two versions of a tone available and flipping between them *instantly*. Your brain can compare two stimuli that are seconds apart way better than two stimuli a minute apart.',
+    },
+    { kind: 'h2', text: 'Using slots in this Lab' },
+    {
+      kind: 'p',
+      text: 'Above the chain you\'ll see two tabs: **A** and **B**. Each is an independent chain. You can:',
+    },
+    {
+      kind: 'list',
+      ordered: true,
+      items: [
+        'Build a tone in **A**.',
+        'Click **A → B** to copy it into slot B.',
+        'Click **B**, tweak something — try changing one block, one knob, or one effect order.',
+        'Now flip between **A** and **B** (or press the **A** / **B** keyboard hotkeys) while playing. Your brain can hear the difference instantly.',
+        'If B is better, click **B → A** to "commit" it and start a new round of tweaks.',
+        'If A is better, switch back, no harm done.',
+      ],
+    },
+    {
+      kind: 'callout',
+      flavor: 'tip',
+      title: 'Level-match first',
+      text: 'A/B is meaningless if the two versions are at different volumes — louder always sounds "better" because of how human hearing works (Fletcher-Munson curves). Before evaluating, set the master or block output gains so both A and B are *equally loud*. Only then are you comparing tone instead of volume.',
+    },
+    { kind: 'h2', text: 'What to compare' },
+    {
+      kind: 'list',
+      items: [
+        '**Effect order**: same blocks in two different orders. Reverb → distortion vs distortion → reverb is a classic; you\'ll never confuse them again after A/Bing once.',
+        '**Different cabs**: same amp + drive, just swap the cab block. The cab matters more than people think — A/B makes it obvious.',
+        '**With vs without a block**: copy chain to B, then disable one block in B. Did the chain need it?',
+        '**Different amps**: same drive, same cab, just swap the amp model. Hear what each amp\'s saturation character does.',
+        '**Settings**: copy chain to B, change ONE knob a lot. Then A/B and ask "does the change make it better, or just different?"',
+      ],
+    },
+    {
+      kind: 'demo',
+      demo: {
+        label: 'A/B starter — Marshall vs Mesa',
+        description:
+          'Loads a Marshall-amp chain into the active slot. After loading, click "A → B" in the slot switcher, then in slot B replace the Marshall block with a Mesa Hi-Gain (Effects palette at the bottom). Now flip A / B while playing — same drive, same cab, only the amp model changes.',
+        chain: [
+          {
+            defId: 'overdrive',
+            bypass: false,
+            paramValues: { drive: 0.2, tone: 3000, level: 3, mix: 1 },
+          },
+          {
+            defId: 'amp-marshall-crunch',
+            bypass: false,
+            paramValues: {
+              gain: 5,
+              bass: -1,
+              mid: 3,
+              treble: 4,
+              presence: 3,
+              sag: 4,
+              volume: 0,
+            },
+          },
+          {
+            defId: 'cab-v30',
+            bypass: false,
+            paramValues: { lowCut: 100, highCut: 5500, air: 0, mix: 1 },
+          },
+          {
+            defId: 'reverb-hall',
+            bypass: false,
+            paramValues: { size: 0.4, dampening: 6000, preDelay: 20, mix: 0.18 },
+          },
+        ],
+        play: { kind: 'chord', notes: ['E2', 'B2', 'E3', 'G3', 'B3', 'E4'] },
+      },
+    },
+    { kind: 'h2', text: 'Why this works' },
+    {
+      kind: 'p',
+      text: 'Your auditory cortex is wired to detect change, not absolute qualities. Two consecutive stimuli ~1 second apart light up your "difference detector"; the same two stimuli minutes apart trigger memory reconstruction, which is unreliable. Pro audio engineers do A/B comparisons obsessively — for every EQ move, every compressor setting, every mixing decision. It\'s not a special skill; it\'s a basic discipline that makes them sound consistently better than people who tweak by feel.',
+    },
+  ],
+};
+
 // ----------------------------------------------------------------------------
 // Chapter assembly
 // ----------------------------------------------------------------------------
@@ -1248,6 +1344,7 @@ const buildingBlocks: Chapter = {
     lessonModulation,
     lessonCabsAndIRs,
     lessonTempoSync,
+    lessonABCompare,
     lessonBuildingTone,
   ],
 };

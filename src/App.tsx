@@ -9,6 +9,7 @@ import { EffectPalette } from './components/EffectPalette';
 import { LessonPanel } from './components/LessonPanel';
 import { PresetBar } from './components/PresetBar';
 import { SignalChain } from './components/SignalChain';
+import { SlotSwitcher } from './components/SlotSwitcher';
 import { SourceSelector } from './components/SourceSelector';
 import { TapTempo } from './components/TapTempo';
 import { Tuner } from './components/Tuner';
@@ -69,12 +70,28 @@ const blockFromPreset = (
   return { id: newBlockId(), defId, bypass, paramValues: merged };
 };
 
+/** Deep-clone a chain with fresh block IDs — used by "Copy A → B" etc. */
+const cloneChain = (chain: ChainBlock[]): ChainBlock[] =>
+  chain.map((b) => ({
+    id: newBlockId(),
+    defId: b.defId,
+    bypass: b.bypass,
+    paramValues: { ...b.paramValues },
+  }));
+
 type Tab = 'lab' | 'classroom';
+type Slot = 'A' | 'B';
 
 export default function App() {
   const [tab, setTab] = useState<Tab>('lab');
   const [started, setStarted] = useState(false);
-  const [chain, setChain] = useState<ChainBlock[]>(defaultChain);
+
+  // A/B slots — two independent chains. Active slot's chain is what feeds the
+  // engine; switching slots rebuilds the engine's audio graph.
+  const [chainA, setChainA] = useState<ChainBlock[]>(defaultChain);
+  const [chainB, setChainB] = useState<ChainBlock[]>(() => cloneChain(defaultChain()));
+  const [activeSlot, setActiveSlot] = useState<Slot>('A');
+
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [masterDb, setMasterDb] = useState(-6);
   const [source, setSource] = useState<SourceKind>('synth');
@@ -82,6 +99,12 @@ export default function App() {
   const [pickupId, setPickupId] = useState<PickupId>('strat-bridge');
   const [showTuner, setShowTuner] = useState(false);
   const [bpm, setBpm] = useState(120);
+
+  const chain = activeSlot === 'A' ? chainA : chainB;
+  const setChainForSlot = (slot: Slot, next: ChainBlock[]) => {
+    if (slot === 'A') setChainA(next);
+    else setChainB(next);
+  };
 
   useEffect(() => {
     engine.setChain(chain);
@@ -96,7 +119,7 @@ export default function App() {
   };
 
   const updateChain = (next: ChainBlock[]) => {
-    setChain(next);
+    setChainForSlot(activeSlot, next);
     engine.setChain(next);
   };
 
@@ -126,7 +149,7 @@ export default function App() {
         ? { ...b, paramValues: { ...b.paramValues, [paramId]: value } }
         : b
     );
-    setChain(next);
+    setChainForSlot(activeSlot, next);
     engine.setParam(id, paramId, value);
   };
 
@@ -147,8 +170,6 @@ export default function App() {
   };
 
   const handleSourceChange = () => {
-    // Pull updated state from engine (which is the source of truth for
-    // whether mic permission was granted etc.)
     setSource(engine.getSource());
     setPickupId(engine.getPickupId());
   };
@@ -171,15 +192,39 @@ export default function App() {
     setSelectedId(null);
   };
 
+  const handleSwitchSlot = (slot: Slot) => {
+    if (slot === activeSlot) return;
+    setActiveSlot(slot);
+    const next = slot === 'A' ? chainA : chainB;
+    engine.setChain(next);
+    // Drop selection — it points at the old slot's block IDs.
+    setSelectedId(null);
+  };
+
+  const handleCopyAToB = () => {
+    const copy = cloneChain(chainA);
+    setChainB(copy);
+    if (activeSlot === 'B') {
+      engine.setChain(copy);
+      setSelectedId(null);
+    }
+  };
+
+  const handleCopyBToA = () => {
+    const copy = cloneChain(chainB);
+    setChainA(copy);
+    if (activeSlot === 'A') {
+      engine.setChain(copy);
+      setSelectedId(null);
+    }
+  };
+
   const handleTryDemo = async (demo: LessonDemo) => {
-    // 1) Ensure audio is started (auto-prompt user gesture is satisfied by
-    //    the button click that called this handler).
     if (!started) {
       await engine.start();
       setStarted(true);
       engine.setMasterVolume(masterDb);
     }
-    // 2) If the demo specifies a chain, load it; otherwise keep the current one.
     if (demo.chain) {
       const next = demo.chain.map((b) =>
         blockFromPreset(b.defId, b.bypass, b.paramValues)
@@ -187,9 +232,7 @@ export default function App() {
       updateChain(next);
       setSelectedId(null);
     }
-    // 3) Switch to the Lab so the user can SEE the visualizer and chain.
     setTab('lab');
-    // 4) Auto-play after a brief delay to let the engine settle on the new chain.
     if (demo.play) {
       setTimeout(() => {
         if (demo.play!.kind === 'note') engine.playNote(demo.play!.note);
@@ -207,6 +250,26 @@ export default function App() {
   useEffect(() => {
     engine.setSelectedBlock(selectedId);
   }, [selectedId]);
+
+  // A/B hotkeys. Ignore when the user is typing in an input or contenteditable.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.isContentEditable)
+      )
+        return;
+      if (e.key === 'a' || e.key === 'A') handleSwitchSlot('A');
+      else if (e.key === 'b' || e.key === 'B') handleSwitchSlot('B');
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeSlot, chainA, chainB]);
 
   return (
     <div className="min-h-screen bg-bg-950 text-zinc-200">
@@ -297,6 +360,15 @@ export default function App() {
               </div>
 
               {showTuner ? <Tuner running={started} /> : null}
+
+              <SlotSwitcher
+                activeSlot={activeSlot}
+                onSwitch={handleSwitchSlot}
+                onCopyAToB={handleCopyAToB}
+                onCopyBToA={handleCopyBToA}
+                slotASize={chainA.length}
+                slotBSize={chainB.length}
+              />
 
               <PresetBar
                 onLoad={handleLoadPreset}
