@@ -60,6 +60,10 @@ Switch between them with the tabs in the header.
 - **Looper:** toggle on a 60-second loop recorder. Captures the post-chain
   wet signal, plays it back continuously, lets you solo over your own
   rhythm tracks. Mono Float32 buffer, sample-accurate playback.
+- **Fretboard:** toggle on an interactive scale visualizer. Pick a root + a
+  scale (major, minor, pentatonic, blues, dorian, mixolydian) and watch
+  every fret position light up. Click any note to play it through the
+  signal chain.
 - **Tap Tempo + synced delays:** tap the **Tap** button in the header in time
   with the music to set the global BPM. Click the delay block, flip **Sync**
   to on, and pick a **Subdivision** (1/2, dot 1/4, 1/4, dot 1/8, 1/8, 1/16) —
@@ -94,6 +98,7 @@ auto-play a relevant chord or note. Current chapters:
   Delays · A/B Compare · Building a Tone From Scratch
 - **Going Live** (4 lessons): Plug In Your Real Guitar · Tuning ·
   Rhythm, Timing, and the Click · Practicing With a Looper
+- **Music Theory for Guitarists** (1 lesson): Reading the Fretboard
 
 ## Project layout
 

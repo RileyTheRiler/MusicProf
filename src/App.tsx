@@ -7,6 +7,7 @@ import { ChordPicker } from './components/ChordPicker';
 import { Classroom } from './components/Classroom';
 import { EffectPalette } from './components/EffectPalette';
 import { ExportModal } from './components/ExportModal';
+import { FretboardView } from './components/FretboardView';
 import { LessonPanel } from './components/LessonPanel';
 import { Looper } from './components/Looper';
 import { MetronomeWidget } from './components/MetronomeWidget';
@@ -106,6 +107,7 @@ export default function App() {
   const [pickupId, setPickupId] = useState<PickupId>(INITIAL_SETTINGS.pickupId);
   const [showTuner, setShowTuner] = useState(INITIAL_SETTINGS.showTuner);
   const [showLooper, setShowLooper] = useState(INITIAL_SETTINGS.showLooper);
+  const [showFretboard, setShowFretboard] = useState(INITIAL_SETTINGS.showFretboard);
   const [bpm, setBpm] = useState(INITIAL_SETTINGS.bpm);
   const [exportOpen, setExportOpen] = useState(false);
 
@@ -135,9 +137,10 @@ export default function App() {
       pickupId,
       showTuner,
       showLooper,
+      showFretboard,
       tab,
     });
-  }, [bpm, masterDb, inputDb, pickupId, showTuner, showLooper, tab]);
+  }, [bpm, masterDb, inputDb, pickupId, showTuner, showLooper, showFretboard, tab]);
 
   const handleStart = async () => {
     await engine.start();
@@ -412,10 +415,21 @@ export default function App() {
                 >
                   {showLooper ? 'Hide looper' : 'Show looper'}
                 </button>
+                <button
+                  onClick={() => setShowFretboard((s) => !s)}
+                  className={`text-xs px-3 py-1.5 rounded border transition-colors ${
+                    showFretboard
+                      ? 'border-accent-amber text-accent-amber bg-amber-500/10'
+                      : 'border-bg-600 text-zinc-400 hover:text-zinc-200 bg-bg-800'
+                  }`}
+                >
+                  {showFretboard ? 'Hide fretboard' : 'Show fretboard'}
+                </button>
               </div>
 
               {showTuner ? <Tuner running={started} /> : null}
               {showLooper ? <Looper running={started} /> : null}
+              {showFretboard ? <FretboardView /> : null}
 
               <SlotSwitcher
                 activeSlot={activeSlot}

@@ -1620,7 +1620,110 @@ const goingLive: Chapter = {
   ],
 };
 
-export const CURRICULUM: Chapter[] = [foundations, buildingBlocks, goingLive];
+// ----------------------------------------------------------------------------
+// Chapter 4 — Music Theory for Guitarists
+// ----------------------------------------------------------------------------
+
+const lessonReadingFretboard: Lesson = {
+  id: 'reading-fretboard',
+  title: 'Reading the Fretboard',
+  subtitle:
+    'Scales, modes, and the geometry that makes them learnable on guitar.',
+  estMinutes: 6,
+  body: [
+    {
+      kind: 'p',
+      text: 'Music theory feels intimidating on paper but reveals beautiful patterns on a fretboard. Click **Show fretboard** in the Lab to open an interactive scale visualizer.',
+    },
+    { kind: 'h2', text: 'Pitch classes vs notes' },
+    {
+      kind: 'p',
+      text: 'There are only **12 pitch classes** in Western music: C, C#, D, D#, E, F, F#, G, G#, A, A#, B — then back to C. The same pitch class repeats in every octave. So "A" is a pitch class; "A4" (440 Hz) is a specific note in a specific octave. When we talk about scales, we talk about pitch classes — they\'re position-invariant.',
+    },
+    { kind: 'h2', text: 'A scale is a recipe' },
+    {
+      kind: 'p',
+      text: 'A scale is a recipe for which pitch classes to use from a given starting note ("root"). The recipe is a list of **intervals** measured in semitones (half-steps). For example:',
+    },
+    {
+      kind: 'list',
+      items: [
+        '**Major scale** — `[0, 2, 4, 5, 7, 9, 11]` semitones from the root. Step pattern W-W-H-W-W-W-H.',
+        '**Natural minor** — `[0, 2, 3, 5, 7, 8, 10]`. Step pattern W-H-W-W-H-W-W. Same set of pitch classes as the major scale starting from its 6th degree (A minor = C major).',
+        '**Major pentatonic** — `[0, 2, 4, 7, 9]`. Major scale minus the 4th and 7th — no half-steps means it always sounds "safe".',
+        '**Minor pentatonic** — `[0, 3, 5, 7, 10]`. THE rock and blues vocabulary. Every guitarist learns it first.',
+        '**Blues** — minor pentatonic + the "blue note" (flat 5). Six notes that define the entire blues idiom.',
+      ],
+    },
+    {
+      kind: 'callout',
+      flavor: 'tip',
+      title: 'Modes',
+      text: 'A "mode" is a major scale played starting from a different degree. Dorian = major scale starting from the 2nd; Mixolydian = major from the 5th; Aeolian (natural minor) = major from the 6th. Different starting points give different "flavors" without changing the underlying pitch classes — the same 7 notes, just heard relative to a different root.',
+    },
+    { kind: 'h2', text: 'The visualizer' },
+    {
+      kind: 'list',
+      ordered: true,
+      items: [
+        'Pick a **Root** note (A, B, C, ...).',
+        'Pick a **Scale** (major, minor, pentatonic, blues, dorian, mixolydian).',
+        'The fretboard highlights every fret position that contains a scale note. The **amber** circles are the root note specifically; **green** circles are the other scale tones.',
+        'Click any highlighted note to play it through your current chain.',
+      ],
+    },
+    { kind: 'h2', text: 'Why scales look the way they do on guitar' },
+    {
+      kind: 'p',
+      text: 'Each string is tuned a perfect 4th above the one below it (except B↔G which is a major 3rd). Moving UP one string adds 5 semitones (or 4 for the G→B gap), moving RIGHT one fret adds 1 semitone. This means scale shapes REPEAT across the neck: if you learn the minor pentatonic shape in one position, the same shape works for the same scale in every other position — just slide it to a new root note.',
+    },
+    {
+      kind: 'p',
+      text: 'That\'s the secret of guitar: unlike piano, where C major and E major are entirely different finger patterns, on guitar they\'re the SAME shape, just moved to a different fret. Learning one shape teaches you all 12 keys at once.',
+    },
+    {
+      kind: 'callout',
+      flavor: 'info',
+      title: 'Practice exercise',
+      text: 'Set the root to A and the scale to Minor Pentatonic. The classic "blues box" shape lights up at frets 5-8 of the 6th string upward. Memorize this shape. Now change root to C — the same shape moves to frets 8-11. Same shape, different key. Try every note as root; you\'ll be able to play A minor pentatonic anywhere on the neck by sight.',
+    },
+    { kind: 'h2', text: 'Connecting it back to playing' },
+    {
+      kind: 'p',
+      text: 'A complete practice loop using everything in this app:',
+    },
+    {
+      kind: 'list',
+      ordered: true,
+      items: [
+        'Set BPM and turn on the **metronome**.',
+        'Show the **fretboard** with the scale you want to solo in.',
+        'Set a tone (any preset).',
+        '**Record** 4 bars of a chord progression in the **looper**.',
+        'Now improvise over the loop using the highlighted notes on the fretboard.',
+      ],
+    },
+    {
+      kind: 'p',
+      text: 'That\'s how working musicians practice. Real backing context (the loop), unwavering time reference (the metronome), explicit scale guidance (the fretboard). You\'re not just memorizing patterns — you\'re training your ear to associate fretboard positions with sounds, against a harmonic background.',
+    },
+  ],
+};
+
+const musicTheory: Chapter = {
+  id: 'music-theory',
+  title: 'Music Theory for Guitarists',
+  description:
+    'Just enough theory to make sense of the fretboard. Pattern-based, not notation-based.',
+  lessons: [lessonReadingFretboard],
+};
+
+export const CURRICULUM: Chapter[] = [
+  foundations,
+  buildingBlocks,
+  goingLive,
+  musicTheory,
+];
 
 export function findLesson(id: string): Lesson | null {
   for (const ch of CURRICULUM) {

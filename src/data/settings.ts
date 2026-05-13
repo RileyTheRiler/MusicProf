@@ -12,6 +12,7 @@ export interface PersistedSettings {
   pickupId: PickupId;
   showTuner: boolean;
   showLooper: boolean;
+  showFretboard: boolean;
   /** Last active tab — 'lab' or 'classroom'. */
   tab: 'lab' | 'classroom';
 }
@@ -25,6 +26,7 @@ export const DEFAULT_SETTINGS: PersistedSettings = {
   pickupId: 'strat-bridge',
   showTuner: false,
   showLooper: false,
+  showFretboard: false,
   tab: 'lab',
 };
 
@@ -61,6 +63,10 @@ export function loadSettings(): PersistedSettings {
         typeof o.showLooper === 'boolean'
           ? o.showLooper
           : DEFAULT_SETTINGS.showLooper,
+      showFretboard:
+        typeof o.showFretboard === 'boolean'
+          ? o.showFretboard
+          : DEFAULT_SETTINGS.showFretboard,
       tab: o.tab === 'classroom' ? 'classroom' : 'lab',
     };
   } catch {
