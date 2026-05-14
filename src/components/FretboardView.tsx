@@ -5,7 +5,14 @@ import {
   noteAtFret,
   SINGLE_DOT_FRETS,
 } from '../music/fretboard';
-import { isInScale, NOTE_NAMES, SCALE_LIST, SCALES } from '../music/scales';
+import {
+  isInScale,
+  NOTE_NAMES,
+  SCALE_CATEGORY_LABELS,
+  SCALE_CATEGORY_ORDER,
+  SCALE_LIST,
+  SCALES,
+} from '../music/scales';
 
 const NUM_FRETS = 15;
 const FRET_WIDTH = 56;
@@ -57,17 +64,25 @@ export function FretboardView() {
             </select>
           </label>
           <label className="flex items-center gap-1.5 text-xs">
-            <span className="text-zinc-500">Scale</span>
+            <span className="text-zinc-500">Scale / Chord</span>
             <select
               value={scaleId}
               onChange={(e) => setScaleId(e.target.value)}
               className="bg-bg-800 border border-bg-600 rounded px-2 py-1 text-sm text-zinc-200"
             >
-              {SCALE_LIST.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.label}
-                </option>
-              ))}
+              {SCALE_CATEGORY_ORDER.map((cat) => {
+                const items = SCALE_LIST.filter((s) => s.category === cat);
+                if (items.length === 0) return null;
+                return (
+                  <optgroup key={cat} label={SCALE_CATEGORY_LABELS[cat]}>
+                    {items.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.label}
+                      </option>
+                    ))}
+                  </optgroup>
+                );
+              })}
             </select>
           </label>
         </div>

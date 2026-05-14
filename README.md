@@ -98,7 +98,8 @@ auto-play a relevant chord or note. Current chapters:
   Delays · A/B Compare · Building a Tone From Scratch
 - **Going Live** (4 lessons): Plug In Your Real Guitar · Tuning ·
   Rhythm, Timing, and the Click · Practicing With a Looper
-- **Music Theory for Guitarists** (1 lesson): Reading the Fretboard
+- **Music Theory for Guitarists** (2 lessons): Reading the Fretboard ·
+  Chord Construction
 
 ## Project layout
 

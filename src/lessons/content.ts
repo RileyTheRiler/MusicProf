@@ -1710,12 +1710,131 @@ const lessonReadingFretboard: Lesson = {
   ],
 };
 
+const lessonChordConstruction: Lesson = {
+  id: 'chord-construction',
+  title: 'Chord Construction',
+  subtitle:
+    'What major, minor, sus, dim, aug, and 7th chords ACTUALLY are — just sets of intervals stacked above a root.',
+  estMinutes: 7,
+  body: [
+    {
+      kind: 'p',
+      text: 'A chord is just a set of notes played at the same time. The names — major, minor, sus2, dim — describe *which* notes relative to a root. Once you see the pattern of intervals, every chord name becomes meaningful.',
+    },
+    { kind: 'h2', text: 'Triads — the 3-note backbone' },
+    {
+      kind: 'p',
+      text: 'Most chord names start from one of two **triads** (3-note chords). All triads are built by stacking thirds:',
+    },
+    {
+      kind: 'list',
+      items: [
+        '**Major triad** — Root + major 3rd (4 semitones) + perfect 5th (7 semitones). Notes: 1, 3, 5. Bright, "happy", resolved.',
+        '**Minor triad** — Root + minor 3rd (3 semitones) + perfect 5th. Notes: 1, ♭3, 5. The ONLY difference from major is the 3rd is one fret lower. That one fret changes the entire emotional character.',
+      ],
+    },
+    {
+      kind: 'callout',
+      flavor: 'info',
+      title: 'Why the 3rd matters so much',
+      text: 'The 3rd is the "color tone" — it tells your ear whether the chord is major or minor. The root and 5th are stable; the 3rd is what carries the emotion. That\'s why a "power chord" (root + 5th only, no 3rd) sounds neither happy nor sad — it\'s ambiguous, which is exactly why it works through distortion (no clashing intermodulation between major and minor 3rds).',
+    },
+    { kind: 'h2', text: 'Sus chords — the suspended 3rd' },
+    {
+      kind: 'p',
+      text: '"Sus" = "suspended". A sus chord REPLACES the 3rd with either the 2nd or the 4th. Since there\'s no 3rd, the chord is neither major nor minor — it sounds "open" or "unresolved", and our ear typically wants it to resolve back to a major chord.',
+    },
+    {
+      kind: 'list',
+      items: [
+        '**Sus2** — Root + 2nd + 5th. Notes: 1, 2, 5.',
+        '**Sus4** — Root + 4th + 5th. Notes: 1, 4, 5.',
+      ],
+    },
+    { kind: 'h2', text: 'Dim and Aug — modified 5ths' },
+    {
+      kind: 'list',
+      items: [
+        '**Diminished** — Minor triad with a **flat 5th**. Notes: 1, ♭3, ♭5. Two minor thirds stacked. Tense and unresolved.',
+        '**Augmented** — Major triad with a **sharp 5th**. Notes: 1, 3, ♯5. Two major thirds stacked. Dreamy and otherworldly.',
+      ],
+    },
+    { kind: 'h2', text: '7th chords — add another third' },
+    {
+      kind: 'p',
+      text: 'Take a triad and stack one more third on top. The result is a 4-note chord called a "7th chord" because the new note is a 7th interval from the root.',
+    },
+    {
+      kind: 'list',
+      items: [
+        '**Major 7** — Major triad + major 7th. Notes: 1, 3, 5, 7. Lush and jazzy.',
+        '**Dominant 7** — Major triad + ♭7. Notes: 1, 3, 5, ♭7. The "blues chord" — wants to resolve. Called "dominant" because it traditionally functions as the V chord that resolves to I.',
+        '**Minor 7** — Minor triad + ♭7. Notes: 1, ♭3, 5, ♭7. Smooth, jazzy minor. The opening "Tom Sawyer" chord.',
+      ],
+    },
+    { kind: 'h2', text: 'See it on the fretboard' },
+    {
+      kind: 'p',
+      text: 'Click **Show fretboard** in the Lab, then in the **Scale / Chord** dropdown pick **Chords / Triads** → "Major triad (1-3-5)". You\'ll see every position on the fretboard where one of those three notes lives. Toggle through Major, Minor, Sus2, Sus4 — notice how just ONE note changes between each. That\'s the whole game.',
+    },
+    {
+      kind: 'demo',
+      demo: {
+        label: 'Hear the difference: same root, three chord qualities',
+        description:
+          'Loads a clean chain. After loading, open the fretboard, set Root to A, and try the chord types one at a time: Major triad → Minor triad → Sus2. Click the three notes of each to compare by ear. Or use the chord buttons under "Play something".',
+        chain: [
+          {
+            defId: 'amp-fender-clean',
+            bypass: false,
+            paramValues: {
+              gain: 3,
+              bass: 2,
+              mid: 0,
+              treble: 3,
+              presence: 1,
+              sag: 2,
+              volume: 0,
+            },
+          },
+          {
+            defId: 'cab-tweed',
+            bypass: false,
+            paramValues: { lowCut: 80, highCut: 6500, air: 1, mix: 1 },
+          },
+        ],
+        play: { kind: 'chord', notes: ['A2', 'E3', 'A3', 'C#4', 'E4'] },
+      },
+    },
+    { kind: 'h2', text: 'Why guitar chord shapes look the way they do' },
+    {
+      kind: 'p',
+      text: 'A "chord shape" on guitar is a way of arranging the chord\'s required notes (1, 3, 5, sometimes 7) across the 6 strings. Since each string is tuned uniformly, the same shape transposes across the neck — an open E major shape barred at the 1st fret = F major, at the 3rd fret = G major, at the 5th = A major, etc. Memorize one shape, get all 12 keys.',
+    },
+    {
+      kind: 'p',
+      text: 'Voicings differ in which note is on the bottom (root position vs. inversions), and in which octave each note appears. A "Drop D" tuning chord, a barre chord, an open chord, and a power chord can all spell the same chord but sound dramatically different because of how the notes stack acoustically.',
+    },
+    { kind: 'h2', text: 'Putting it together' },
+    {
+      kind: 'p',
+      text: 'A chord progression — say, **Em → C → G → D** — is just a sequence of chords. Each one is a specific set of notes. The reason it sounds "right" is that consecutive chords share notes (Em and C both contain E and G; C and G share C, E, G), making the transitions smooth. That voice-leading is the whole art of harmony.',
+    },
+    {
+      kind: 'callout',
+      flavor: 'tip',
+      title: 'Practice exercise',
+      text: 'Pick a chord progression — Em → C → G → D, or Am → F → C → G. Loop it via the looper. Then on the fretboard, set the root to E (or A) and the scale to Minor Pentatonic. Solo over your progression using ONLY scale notes. You\'ll discover that some scale notes "land" beautifully on certain chord changes and others clash — those clashes are where you learn taste.',
+    },
+  ],
+};
+
 const musicTheory: Chapter = {
   id: 'music-theory',
   title: 'Music Theory for Guitarists',
   description:
     'Just enough theory to make sense of the fretboard. Pattern-based, not notation-based.',
-  lessons: [lessonReadingFretboard],
+  lessons: [lessonReadingFretboard, lessonChordConstruction],
 };
 
 export const CURRICULUM: Chapter[] = [
